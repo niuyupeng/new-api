@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useState, useEffect, type KeyboardEvent } from 'react'
+import { useState, useEffect, useRef, type KeyboardEvent } from 'react'
 import { Code, Table, Plus, Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
@@ -45,6 +45,7 @@ export function ModelMappingEditor({
   const [mode, setMode] = useState<'visual' | 'json'>('visual')
   const [rows, setRows] = useState<MappingRow[]>([])
   const [jsonValue, setJsonValue] = useState(value)
+  const lastInternalValueRef = useRef<string | null>(null)
 
   const parseJsonToRows = (json: string) => {
     try {
@@ -68,10 +69,23 @@ export function ModelMappingEditor({
 
   // Parse JSON to rows when value changes externally
   useEffect(() => {
+    if (value === lastInternalValueRef.current) {
+      // The parent echoes our own edit through react-hook-form. Keep the
+      // current row objects mounted so the focused input does not lose focus.
+      lastInternalValueRef.current = null
+      return
+    }
+
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setJsonValue(value)
     parseJsonToRows(value)
   }, [value])
+
+  const commitValue = (nextValue: string) => {
+    lastInternalValueRef.current = nextValue
+    setJsonValue(nextValue)
+    onChange(nextValue)
+  }
 
   const convertRowsToJson = (updatedRows: MappingRow[]): string => {
     if (updatedRows.length === 0) {
@@ -114,8 +128,7 @@ export function ModelMappingEditor({
     const updatedRows = rows.filter((row) => row.id !== id)
     setRows(updatedRows)
     const json = convertRowsToJson(updatedRows)
-    setJsonValue(json)
-    onChange(json)
+    commitValue(json)
   }
 
   const handleRowChange = (
@@ -128,13 +141,11 @@ export function ModelMappingEditor({
     )
     setRows(updatedRows)
     const json = convertRowsToJson(updatedRows)
-    setJsonValue(json)
-    onChange(json)
+    commitValue(json)
   }
 
   const handleJsonChange = (newJson: string) => {
-    setJsonValue(newJson)
-    onChange(newJson)
+    commitValue(newJson)
     parseJsonToRows(newJson)
   }
 
@@ -144,8 +155,7 @@ export function ModelMappingEditor({
       null,
       2
     )
-    setJsonValue(template)
-    onChange(template)
+    commitValue(template)
     parseJsonToRows(template)
   }
 
@@ -153,8 +163,7 @@ export function ModelMappingEditor({
     if (mode === 'visual') {
       // Switching to JSON mode: sync rows to JSON
       const json = convertRowsToJson(rows)
-      setJsonValue(json)
-      onChange(json)
+      commitValue(json)
       setMode('json')
     } else {
       // Switching to visual mode: sync JSON to rows
