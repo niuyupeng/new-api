@@ -1,8 +1,7 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useState } from 'react'
 import {
   Download,
   Eraser,
-  KeyRound,
   Link2,
   Moon,
   RefreshCw,
@@ -18,7 +17,6 @@ import { useTheme } from '@/context/theme-provider'
 
 const STORAGE_KEYS = {
   customBaseUrl: 'ccapi_custom_base_url',
-  customApiKey: 'ccapi_custom_api_key',
   defaultChatModel: 'ccapi_default_chat_model',
   defaultImageModel: 'ccapi_default_image_model',
   chatSessions: 'ccapi_chat_sessions',
@@ -45,9 +43,6 @@ export function LocalSettings() {
   const [baseUrl, setBaseUrl] = useState(() =>
     getStorageValue(STORAGE_KEYS.customBaseUrl, 'https://ccapi.chat/v1')
   )
-  const [apiKey, setApiKey] = useState(() =>
-    getStorageValue(STORAGE_KEYS.customApiKey)
-  )
   const [chatModel, setChatModel] = useState(() =>
     getStorageValue(STORAGE_KEYS.defaultChatModel, 'gpt-5.3-codex-spark')
   )
@@ -57,19 +52,12 @@ export function LocalSettings() {
   const [healthMessage, setHealthMessage] = useState('尚未测试连接')
   const [testing, setTesting] = useState(false)
 
-  const maskedKey = useMemo(() => {
-    if (!apiKey) return '未填写'
-    if (apiKey.length <= 12) return '已填写，已隐藏'
-    return `${apiKey.slice(0, 6)}...${apiKey.slice(-4)}`
-  }, [apiKey])
-
   const save = useCallback(() => {
     setStorageValue(STORAGE_KEYS.customBaseUrl, baseUrl.trim())
-    setStorageValue(STORAGE_KEYS.customApiKey, apiKey.trim())
     setStorageValue(STORAGE_KEYS.defaultChatModel, chatModel.trim())
     setStorageValue(STORAGE_KEYS.defaultImageModel, imageModel.trim())
     toast.success('本地设置已保存')
-  }, [apiKey, baseUrl, chatModel, imageModel])
+  }, [baseUrl, chatModel, imageModel])
 
   const testHealth = useCallback(async () => {
     setTesting(true)
@@ -121,7 +109,7 @@ export function LocalSettings() {
     <SectionPageLayout>
       <SectionPageLayout.Title>本地设置</SectionPageLayout.Title>
       <SectionPageLayout.Description>
-        配置 ccapi 前端偏好。服务端 Key 不会在这里展示，用户自填 Key 只保存在本机浏览器。
+        配置 ccapi 前端偏好。真实 API Key 由控制台账号体系管理，充值后在 API 密钥页面生成和复制。
       </SectionPageLayout.Description>
       <SectionPageLayout.Actions>
         <Button onClick={save}>
@@ -135,7 +123,7 @@ export function LocalSettings() {
             <Panel
               icon={Link2}
               title='接口接入'
-              desc='默认推荐使用服务端渠道和账号体系。这里的本地配置适合临时调试。'
+              desc='这里仅保存前端显示偏好；不会保存、覆盖或上传任何本地测试 API Key。'
             >
               <Field label='Base URL'>
                 <Input
@@ -144,17 +132,9 @@ export function LocalSettings() {
                   placeholder='https://ccapi.chat/v1'
                 />
               </Field>
-              <Field label='API Key'>
-                <Input
-                  value={apiKey}
-                  onChange={(event) => setApiKey(event.target.value)}
-                  placeholder='sk-your-api-key'
-                  type='password'
-                />
-                <p className='text-muted-foreground mt-2 text-xs'>
-                  当前：{maskedKey}。本地 Key 不会上传到 README 或仓库，但浏览器扩展仍可能读取页面数据，请谨慎使用。
-                </p>
-              </Field>
+              <p className='text-muted-foreground rounded-lg border bg-muted/40 p-3 text-sm leading-6'>
+                客户使用时请先充值，再到控制台的 API 密钥页面创建 Key。测试用 Key 不会写入前端代码、环境示例或文档。
+              </p>
               <div className='grid gap-3 md:grid-cols-2'>
                 <Field label='默认聊天模型'>
                   <Input
@@ -209,7 +189,7 @@ export function LocalSettings() {
 
           <aside className='space-y-4'>
             <Panel
-              icon={KeyRound}
+              icon={ShieldCheck}
               title='连接测试'
               desc='测试当前站点接口服务是否可达，不会返回或展示服务端 API Key。'
             >
@@ -229,11 +209,10 @@ export function LocalSettings() {
             <Panel
               icon={Sun}
               title='环境变量模式'
-              desc='生产部署时请优先使用服务端配置，不要把真实 Key 写进前端。'
+              desc='生产部署继续使用 New API 后台渠道和用户密钥系统；前端环境文件不放本地测试 Key。'
             >
               <pre className='overflow-x-auto rounded-lg bg-muted p-3 text-xs leading-6'>
                 <code>{`NEWAPI_BASE_URL=https://ccapi.chat/v1
-NEWAPI_API_KEY=sk-your-api-key
 DEFAULT_CHAT_MODEL=gpt-5.3-codex-spark
 DEFAULT_IMAGE_MODEL=gpt-image-2`}</code>
               </pre>

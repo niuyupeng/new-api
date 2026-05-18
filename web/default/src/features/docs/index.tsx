@@ -401,8 +401,8 @@ export function ApiDocs() {
                 </Button>
               </div>
               <p className='mt-4 text-xs leading-6 text-[#a99886]'>
-                示例 Key 统一写作 sk-your-api-key。不要把真实 Key 放进
-                README、公开仓库或截图里。
+                示例 Key 统一写作 sk-your-api-key。实际使用请先充值，再到控制台
+                API 密钥页面生成自己的 Key；不要把真实 Key 放进 README、公开仓库或截图里。
               </p>
             </div>
           </div>
