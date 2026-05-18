@@ -336,7 +336,7 @@ function DraftNumberInput({
 
   useEffect(() => {
     if (!focused) {
-      setDraft(formatNumberDraft(value))
+      queueMicrotask(() => setDraft(formatNumberDraft(value)))
     }
   }, [focused, value])
 

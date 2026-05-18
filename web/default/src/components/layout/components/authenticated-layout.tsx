@@ -1,3 +1,4 @@
+import { useLocation } from '@tanstack/react-router'
 import { getCookie } from '@/lib/cookies'
 import { cn } from '@/lib/utils'
 import { LayoutProvider } from '@/context/layout-provider'
@@ -14,24 +15,33 @@ type AuthenticatedLayoutProps = {
 
 export function AuthenticatedLayout(props: AuthenticatedLayoutProps) {
   const defaultOpen = getCookie('sidebar_state') !== 'false'
+  const location = useLocation()
+  const isChatRoute =
+    location.pathname === '/chat' || location.pathname.startsWith('/chat/')
 
   return (
     <LayoutProvider>
       <SearchProvider>
         <WorkspaceProvider>
-          <SidebarProvider defaultOpen={defaultOpen}>
-            <SkipToMain />
-            <AppSidebar />
-            <SidebarInset
-              className={cn(
-                '@container/content',
-                'h-svh',
-                'peer-data-[variant=inset]:h-[calc(100svh-(var(--spacing)*4))]'
-              )}
-            >
+          {isChatRoute ? (
+            <div className='min-h-svh bg-background'>
               {props.children ?? <AnimatedOutlet />}
-            </SidebarInset>
-          </SidebarProvider>
+            </div>
+          ) : (
+            <SidebarProvider defaultOpen={defaultOpen}>
+              <SkipToMain />
+              <AppSidebar />
+              <SidebarInset
+                className={cn(
+                  '@container/content',
+                  'h-svh',
+                  'peer-data-[variant=inset]:h-[calc(100svh-(var(--spacing)*4))]'
+                )}
+              >
+                {props.children ?? <AnimatedOutlet />}
+              </SidebarInset>
+            </SidebarProvider>
+          )}
         </WorkspaceProvider>
       </SearchProvider>
     </LayoutProvider>

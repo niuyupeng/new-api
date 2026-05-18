@@ -52,6 +52,7 @@ export function useStatus() {
     staleTime: 5 * 60 * 1000,
     // Cache expires after 30 minutes
     gcTime: 30 * 60 * 1000,
+    retry: false,
   })
 
   return {

@@ -77,7 +77,7 @@ function ChatRouteComponent() {
 
   if (!preset) {
     return (
-      <div className='flex h-full flex-col items-center justify-center gap-4 p-6 text-center'>
+      <div className='flex h-svh flex-col items-center justify-center gap-4 bg-background p-6 text-center'>
         <MessageCircleWarning className='text-muted-foreground h-12 w-12' />
         <div className='space-y-1'>
           <h2 className='text-lg font-semibold'>
@@ -96,7 +96,7 @@ function ChatRouteComponent() {
 
   if (!isWebLink) {
     return (
-      <div className='flex h-full flex-col items-center justify-center gap-4 p-6 text-center'>
+      <div className='flex h-svh flex-col items-center justify-center gap-4 bg-background p-6 text-center'>
         <MessageCircleWarning className='text-muted-foreground h-12 w-12' />
         <div className='space-y-1'>
           <h2 className='text-lg font-semibold'>{t('Use sidebar shortcut')}</h2>
@@ -116,7 +116,7 @@ function ChatRouteComponent() {
 
   if (requiresActiveKey && isPending) {
     return (
-      <div className='flex h-full flex-col items-center justify-center gap-4'>
+      <div className='flex h-svh flex-col items-center justify-center gap-4 bg-background'>
         <Loader2 className='text-muted-foreground h-8 w-8 animate-spin' />
         <p className='text-muted-foreground text-sm'>
           {t('Preparing your chat link…')}
@@ -131,7 +131,7 @@ function ChatRouteComponent() {
         ? error.message
         : 'Unable to generate chat link. Please check your API keys.'
     return (
-      <div className='flex h-full flex-col items-center justify-center p-6'>
+      <div className='flex h-svh flex-col items-center justify-center bg-background p-6'>
         <Alert variant='destructive' className='max-w-xl'>
           <AlertTitle>{t('Unable to open chat')}</AlertTitle>
           <AlertDescription>{message}</AlertDescription>
@@ -142,7 +142,7 @@ function ChatRouteComponent() {
 
   if (!requiresActiveKey && !iframeSrc) {
     return (
-      <div className='flex h-full flex-col items-center justify-center p-6'>
+      <div className='flex h-svh flex-col items-center justify-center bg-background p-6'>
         <Alert variant='destructive' className='max-w-xl'>
           <AlertTitle>{t('Unable to open chat')}</AlertTitle>
           <AlertDescription>
@@ -159,7 +159,7 @@ function ChatRouteComponent() {
     <iframe
       src={iframeSrc}
       key={iframeSrc}
-      className='h-full w-full border-0'
+      className='h-svh w-full border-0 bg-background'
       allow='camera; microphone'
       title={`Chat preset: ${preset.name}`}
     />

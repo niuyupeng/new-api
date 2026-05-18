@@ -187,7 +187,9 @@ export async function getUserGroups(): Promise<{
 
 // Get system status
 export async function getStatus() {
-  const res = await api.get('/api/status')
+  const res = await api.get('/api/status', {
+    skipErrorHandler: true,
+  } as unknown as Parameters<typeof api.get>[1])
   return res.data?.data as Record<string, unknown>
 }
 
@@ -197,7 +199,9 @@ export async function getNotice(): Promise<{
   message?: string
   data?: string
 }> {
-  const res = await api.get('/api/notice')
+  const res = await api.get('/api/notice', {
+    skipErrorHandler: true,
+  } as unknown as Parameters<typeof api.get>[1])
   return res.data
 }
 

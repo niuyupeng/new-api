@@ -1,6 +1,10 @@
 import { useMemo } from 'react'
 import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
+import {
+  getCcapiDisplayName,
+  getCcapiLogoForDarkSurface,
+} from '@/lib/ccapi-brand'
 import { cn } from '@/lib/utils'
 import { useSystemConfig } from '@/hooks/use-system-config'
 
@@ -86,8 +90,8 @@ export function Footer(props: FooterProps) {
     demoSiteEnabled,
   } = useSystemConfig()
 
-  const displayLogo = systemLogo || props.logo || '/logo.png'
-  const displayName = systemName || props.name || 'New API'
+  const displayLogo = getCcapiLogoForDarkSurface(systemLogo || props.logo)
+  const displayName = getCcapiDisplayName(systemName || props.name)
   const isDemoSiteMode = Boolean(demoSiteEnabled)
   const currentYear = new Date().getFullYear()
 

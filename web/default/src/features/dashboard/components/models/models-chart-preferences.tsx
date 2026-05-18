@@ -45,7 +45,8 @@ export function ModelsChartPreferences(props: ModelsChartPreferencesProps) {
   )
 
   useEffect(() => {
-    if (open) setDraft(props.preferences)
+    if (!open) return
+    queueMicrotask(() => setDraft(props.preferences))
   }, [open, props.preferences])
 
   const handleSave = () => {

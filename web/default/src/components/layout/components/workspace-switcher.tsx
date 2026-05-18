@@ -3,9 +3,15 @@ import { useNavigate, useLocation } from '@tanstack/react-router'
 import { ChevronsUpDown } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '@/stores/auth-store'
+import {
+  CCAPI_BRAND_NAME,
+  getCcapiDisplayName,
+  getCcapiLogoForDarkSurface,
+} from '@/lib/ccapi-brand'
 import { ROLE } from '@/lib/roles'
 import { useStatus } from '@/hooks/use-status'
 import { useSystemConfig } from '@/hooks/use-system-config'
+import { DASHBOARD_DEFAULT_SECTION } from '@/features/dashboard/section-registry'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -37,7 +43,7 @@ type WorkspaceSwitcherProps = {
  */
 export function WorkspaceSwitcher({
   workspaces,
-  defaultName = 'New API',
+  defaultName = CCAPI_BRAND_NAME,
   defaultVersion,
 }: WorkspaceSwitcherProps) {
   const { t } = useTranslation()
@@ -46,6 +52,7 @@ export function WorkspaceSwitcher({
   const { isMobile } = useSidebar()
   const { status } = useStatus()
   const { logo } = useSystemConfig()
+  const darkLogo = getCcapiLogoForDarkSurface(logo)
   const isSuperAdmin = useAuthStore(
     (state) => state.auth.user?.role === ROLE.SUPER_ADMIN
   )
@@ -61,7 +68,7 @@ export function WorkspaceSwitcher({
           index === 0
             ? {
                 ...workspace,
-                name: status?.system_name || defaultName,
+                name: getCcapiDisplayName(status?.system_name || defaultName),
                 plan: status?.version || defaultVersion || t('Unknown version'),
               }
             : workspace
@@ -112,7 +119,10 @@ export function WorkspaceSwitcher({
     if (workspace.id === WORKSPACE_IDS.SYSTEM_SETTINGS) {
       navigate({ to: '/system-settings/general' })
     } else {
-      navigate({ to: '/dashboard' })
+      navigate({
+        to: '/dashboard/$section',
+        params: { section: DASHBOARD_DEFAULT_SECTION },
+      })
     }
   }
 
@@ -128,11 +138,16 @@ export function WorkspaceSwitcher({
           <activeWorkspace.logo className='size-4' />
         </div>
       ) : (
-        <div className='flex aspect-square size-8 items-center justify-center overflow-hidden rounded-lg'>
+        <div className='flex aspect-square size-8 items-center justify-center overflow-hidden rounded-lg p-0.5'>
           <img
             src={logo}
             alt={t('Logo')}
-            className='size-full rounded-lg object-cover'
+            className='size-full rounded-lg object-contain dark:hidden'
+          />
+          <img
+            src={darkLogo}
+            alt={t('Logo')}
+            className='hidden size-full rounded-lg object-contain dark:block'
           />
         </div>
       )}
@@ -175,11 +190,16 @@ export function WorkspaceSwitcher({
                   className='gap-2 p-2'
                 >
                   {index === 0 ? (
-                    <div className='flex size-6 items-center justify-center overflow-hidden rounded-sm border'>
+                    <div className='flex size-6 items-center justify-center overflow-hidden rounded-sm border p-0.5'>
                       <img
                         src={logo}
                         alt='Logo'
-                        className='size-full object-cover'
+                        className='size-full object-contain dark:hidden'
+                      />
+                      <img
+                        src={darkLogo}
+                        alt='Logo'
+                        className='hidden size-full object-contain dark:block'
                       />
                     </div>
                   ) : (

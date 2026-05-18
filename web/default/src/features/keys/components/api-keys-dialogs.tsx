@@ -13,11 +13,13 @@ export function ApiKeysDialogs() {
     open === 'create' ? 'left' : open === 'update' ? 'right' : lastMutateSide
 
   useEffect(() => {
-    if (open === 'create') {
-      setLastMutateSide('left')
-    } else if (open === 'update') {
-      setLastMutateSide('right')
-    }
+    queueMicrotask(() => {
+      if (open === 'create') {
+        setLastMutateSide('left')
+      } else if (open === 'update') {
+        setLastMutateSide('right')
+      }
+    })
   }, [open])
 
   return (

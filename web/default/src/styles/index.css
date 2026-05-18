@@ -49,6 +49,70 @@
   }
 }
 
+.ccapi-public-header {
+  color: #fff3df;
+}
+
+.ccapi-public-header nav {
+  background: rgba(17, 16, 15, 0.72);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(18px);
+}
+
+.ccapi-public-header a,
+.ccapi-public-header button {
+  color: inherit;
+}
+
+.ccapi-auth-shell input,
+.ccapi-auth-shell button[role='combobox'] {
+  border-color: #ead9c1;
+  background: #fffdf8;
+}
+
+.ccapi-auth-shell input:focus-visible {
+  border-color: #d36f4c;
+  box-shadow: 0 0 0 3px rgba(211, 111, 76, 0.18);
+}
+
+.ccapi-auth-shell form > button[type='submit'],
+.ccapi-auth-shell form > button:not([type]) {
+  min-height: 2.75rem;
+  border-radius: 0.5rem;
+  background: #1a1715;
+  color: #fff3df;
+  font-weight: 800;
+}
+
+.ccapi-auth-shell form > button[type='submit']:hover,
+.ccapi-auth-shell form > button:not([type]):hover {
+  background: #2a2521;
+}
+
+.ccapi-pricing-page main > div,
+.ccapi-pricing-page aside,
+.ccapi-pricing-page [class*='rounded-xl'][class*='border'] {
+  border-color: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.045);
+}
+
+.ccapi-pricing-page table,
+.ccapi-pricing-page thead,
+.ccapi-pricing-page tbody,
+.ccapi-pricing-page [role='table'] {
+  color: #fff3df;
+}
+
+.ccapi-pricing-page input {
+  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(9, 8, 7, 0.78);
+  color: #fff3df;
+}
+
+.ccapi-pricing-page input::placeholder {
+  color: rgba(255, 243, 223, 0.46);
+}
+
 /* Vercel Geist-style skeleton shimmer */
 .skeleton-shimmer {
   background: linear-gradient(

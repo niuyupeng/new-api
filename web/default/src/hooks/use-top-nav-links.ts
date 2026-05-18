@@ -13,10 +13,10 @@ export type TopNavLink = {
 // Default navigation configuration
 const DEFAULT_HEADER_NAV_MODULES = {
   home: true,
-  console: true,
   pricing: { enabled: true, requireAuth: false },
   docs: true,
-  about: true,
+  console: true,
+  about: false,
 }
 
 /**
@@ -59,28 +59,28 @@ export function useTopNavLinks(): TopNavLink[] {
 
   // Home
   if (modules?.home !== false) {
-    links.push({ title: t('Home'), href: '/' })
-  }
-
-  // Console -> /dashboard (new console path)
-  if (modules?.console !== false) {
-    links.push({ title: t('Console'), href: '/dashboard' })
+    links.push({ title: t('首页'), href: '/' })
   }
 
   // Pricing
   const pricing = modules?.pricing
   if (pricing && typeof pricing === 'object' && pricing.enabled) {
     const disabled = pricing.requireAuth && !isAuthed
-    links.push({ title: t('Model Square'), href: '/pricing', disabled })
+    links.push({ title: t('价格'), href: '/pricing', disabled })
   }
 
   // Docs (supports external links)
   if (modules?.docs !== false) {
     if (docsLink) {
-      links.push({ title: t('Docs'), href: docsLink, external: true })
+      links.push({ title: t('接入文档'), href: docsLink, external: true })
     } else {
-      links.push({ title: t('Docs'), href: '/docs' })
+      links.push({ title: t('接入文档'), href: '/docs' })
     }
+  }
+
+  // Console -> /dashboard (new console path)
+  if (modules?.console !== false) {
+    links.push({ title: t('控制台'), href: '/dashboard' })
   }
 
   // About

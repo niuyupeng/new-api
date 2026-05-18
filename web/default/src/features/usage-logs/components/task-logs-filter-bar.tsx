@@ -77,7 +77,7 @@ export function TaskLogsFilterBar(props: TaskLogsFilterBarProps) {
             ...(searchParams.filter ? { taskId: searchParams.filter } : {}),
           }
 
-    setFilters(next)
+    queueMicrotask(() => setFilters(next))
   }, [
     props.logCategory,
     searchParams.startTime,

@@ -2,6 +2,10 @@ import { useState, useEffect } from 'react'
 import { Link, useRouterState } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '@/stores/auth-store'
+import {
+  getCcapiDisplayName,
+  getCcapiLogoForDarkSurface,
+} from '@/lib/ccapi-brand'
 import { cn } from '@/lib/utils'
 import { useNotifications } from '@/hooks/use-notifications'
 import { useSystemConfig } from '@/hooks/use-system-config'
@@ -13,9 +17,23 @@ import { NotificationButton } from '@/components/notification-button'
 import { NotificationDialog } from '@/components/notification-dialog'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ThemeSwitch } from '@/components/theme-switch'
+import { DASHBOARD_DEFAULT_PATH } from '@/features/dashboard/section-registry'
 import { defaultTopNavLinks } from '../config/top-nav.config'
 import type { TopNavLink } from '../types'
 import { HeaderLogo } from './header-logo'
+
+function normalizeNavPath(path: string): string {
+  const cleanPath = path.split(/[?#]/)[0] || '/'
+  if (cleanPath === '/') return cleanPath
+  return cleanPath.endsWith('/') ? cleanPath.slice(0, -1) : cleanPath
+}
+
+function isNavLinkActive(pathname: string, href: string): boolean {
+  const current = normalizeNavPath(pathname)
+  const target = normalizeNavPath(href)
+  if (target === '/') return current === '/'
+  return current === target || current.startsWith(`${target}/`)
+}
 
 export interface PublicHeaderProps {
   navLinks?: TopNavLink[]
@@ -63,8 +81,9 @@ export function PublicHeader(props: PublicHeaderProps) {
 
   const user = auth.user
   const isAuthenticated = !!user
-  const displaySiteName = customSiteName || systemName
-  const links = dynamicLinks.length > 0 ? dynamicLinks : navLinks
+  const displaySiteName = customSiteName || getCcapiDisplayName(systemName)
+  const displayLogo = getCcapiLogoForDarkSurface(systemLogo)
+  const links = navLinks.length > 0 ? navLinks : dynamicLinks
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
@@ -82,7 +101,12 @@ export function PublicHeader(props: PublicHeaderProps) {
 
   return (
     <>
-      <header className='pointer-events-none fixed inset-x-0 top-0 z-50'>
+      <header
+        className={cn(
+          'pointer-events-none fixed inset-x-0 top-0 z-50',
+          props.className
+        )}
+      >
         <div
           className={cn(
             'pointer-events-auto mx-auto transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]',
@@ -102,14 +126,14 @@ export function PublicHeader(props: PublicHeaderProps) {
               to={homeUrl}
               className='group flex shrink-0 items-center gap-2.5'
             >
-              <div className='flex size-7 shrink-0 items-center justify-center transition-all duration-300 group-hover:scale-105'>
+              <div className='flex size-7 shrink-0 items-center justify-center rounded-xl p-0.5 transition-all duration-300 group-hover:scale-105'>
                 {loading ? (
                   <Skeleton className='size-full rounded-lg' />
                 ) : customLogo ? (
                   customLogo
                 ) : (
                   <HeaderLogo
-                    src={systemLogo}
+                    src={displayLogo}
                     loading={loading}
                     logoLoaded={logoLoaded}
                     className='size-full rounded-lg object-contain'
@@ -124,7 +148,7 @@ export function PublicHeader(props: PublicHeaderProps) {
             {/* Desktop nav */}
             <div className='hidden items-center gap-0.5 sm:flex'>
               {links.map((link, i) => {
-                const isActive = pathname === link.href
+                const isActive = isNavLinkActive(pathname, link.href)
                 if (link.external) {
                   return (
                     <a
@@ -132,6 +156,7 @@ export function PublicHeader(props: PublicHeaderProps) {
                       href={link.href}
                       target='_blank'
                       rel='noopener noreferrer'
+                      data-ccapi-nav-link='true'
                       className='text-muted-foreground hover:text-foreground rounded-lg px-3 py-1.5 text-[13px] font-medium transition-colors duration-200'
                     >
                       {t(link.title)}
@@ -142,6 +167,9 @@ export function PublicHeader(props: PublicHeaderProps) {
                   <Link
                     key={i}
                     to={link.href}
+                    aria-current={isActive ? 'page' : undefined}
+                    data-ccapi-nav-link='true'
+                    data-active={isActive ? 'true' : undefined}
                     className={cn(
                       'rounded-lg px-3 py-1.5 text-[13px] font-medium transition-colors duration-200',
                       isActive
@@ -238,11 +266,12 @@ export function PublicHeader(props: PublicHeaderProps) {
         <div className='flex h-full flex-col justify-between px-8 pt-20 pb-10'>
           <nav className='flex flex-col gap-1'>
             {links.map((link, i) => {
-              const isActive = pathname === link.href
+              const isActive = isNavLinkActive(pathname, link.href)
               return (
                 <Link
                   key={i}
                   to={link.href}
+                  aria-current={isActive ? 'page' : undefined}
                   onClick={() => setMobileOpen(false)}
                   className={cn(
                     'flex items-center gap-3 py-3 text-base font-medium tracking-tight transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]',
@@ -272,7 +301,7 @@ export function PublicHeader(props: PublicHeaderProps) {
           >
             {showAuthButtons && (
               <Link
-                to={isAuthenticated ? '/dashboard' : '/sign-in'}
+                to={isAuthenticated ? DASHBOARD_DEFAULT_PATH : '/sign-in'}
                 onClick={() => setMobileOpen(false)}
                 className='bg-foreground text-background inline-flex h-10 items-center justify-center rounded-lg text-sm font-medium transition-opacity hover:opacity-90 active:opacity-80'
               >

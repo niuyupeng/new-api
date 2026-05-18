@@ -58,6 +58,7 @@ export function useNotifications() {
     queryKey: ['notice'],
     queryFn: getNotice,
     staleTime: 1000 * 60 * 5, // 5 minutes
+    retry: false,
   })
 
   // Fetch Announcements from status

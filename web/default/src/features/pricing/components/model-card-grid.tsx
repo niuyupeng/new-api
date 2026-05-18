@@ -23,7 +23,7 @@ export function ModelCardGrid(props: ModelCardGridProps) {
   const totalPages = Math.max(1, Math.ceil(props.models.length / pageSize))
 
   useEffect(() => {
-    setPage(1)
+    queueMicrotask(() => setPage(1))
   }, [props.models])
 
   const pagedModels = useMemo(() => {

@@ -61,6 +61,80 @@
 
 ---
 
+## ccapi / 101AI Frontend Notes
+
+This repository now includes a branded New API default-frontend experience for
+an OpenAI-compatible AI API relay site. It keeps the original New API backend
+and dashboard architecture, while adding product-facing pages for developers and
+end users:
+
+- Landing page: `/`
+- Chat workspace: `/chat`
+- Image workspace: `/chat/image`
+- Model pricing: `/pricing`
+- API integration docs: `/docs`
+- Local frontend settings: `/settings`
+- Console dashboard: `/dashboard`
+
+### Configure NewAPI-compatible Access
+
+Do not commit real keys. Use placeholders in docs and keep production channel
+keys inside the New API admin system.
+
+```bash
+NEWAPI_BASE_URL=https://your-newapi-domain.example/v1
+NEWAPI_API_KEY=sk-your-api-key
+DEFAULT_CHAT_MODEL=gpt-5.3-codex-spark
+DEFAULT_IMAGE_MODEL=gpt-image-2
+NEXT_PUBLIC_APP_NAME=101AI
+NEXT_PUBLIC_BRAND_NAME=101AI
+NEXT_PUBLIC_BRAND_SLOGAN=一个接口，接上你的 AI 工具链
+```
+
+For this Rsbuild frontend, built-in chat uses the authenticated New API relay:
+
+- Chat: `/pg/chat/completions`
+- Image generation: `/pg/images/generations`
+- External OpenAI-compatible clients: `/v1/chat/completions`,
+  `/v1/images/generations`, `/v1/models`
+
+This avoids exposing service-side API keys in the browser. User API keys are
+only shown in the API key management flow when the user explicitly reveals or
+copies them.
+
+### Run the Frontend
+
+```bash
+cd web/default
+bun install
+bun run dev
+bun run lint
+bun run build
+```
+
+The production Go server embeds `web/default/dist`. Build the frontend before
+building the Go binary or Docker image.
+
+### Developer Tool Quick Setup
+
+- Claude Code: choose an OpenAI-compatible/custom provider, set Base URL to
+  `https://your-domain.example/v1`, and paste `sk-your-api-key`.
+- Codex: configure the OpenAI-compatible endpoint and keep the key in local
+  environment/config files rather than source control.
+- Cursor: add a custom OpenAI-compatible provider, set Base URL and model name,
+  then test with a small prompt first.
+- Continue: add an OpenAI-compatible model in `config.json`, read `apiKey` from
+  an environment variable, and set the `apiBase` to your New API `/v1` URL.
+
+Open `/docs` in the frontend for copy-ready curl, Node.js, Python, Claude Code,
+Codex, Cursor, Continue, and image generation examples.
+
+### Open-source References
+
+The ccapi/101AI frontend does not copy BeefAPI, Open WebUI, LobeChat,
+LibreChat, or NextChat branding or source code. The comparison and license notes
+used during design are recorded in `docs/open-source-reference.md`.
+
 ## 🤝 Trusted Partners
 
 <p align="center">

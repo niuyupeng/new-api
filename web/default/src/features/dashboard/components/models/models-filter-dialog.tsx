@@ -73,8 +73,10 @@ export function ModelsFilter(props: ModelsFilterProps) {
   )
 
   useEffect(() => {
-    setFilters(buildDefaultDashboardFilters(props.preferences))
-    setSelectedRange(props.preferences.defaultTimeRangeDays)
+    queueMicrotask(() => {
+      setFilters(buildDefaultDashboardFilters(props.preferences))
+      setSelectedRange(props.preferences.defaultTimeRangeDays)
+    })
   }, [props.preferences])
 
   const handleApply = () => {

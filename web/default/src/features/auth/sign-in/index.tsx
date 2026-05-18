@@ -14,17 +14,20 @@ export function SignIn() {
     <AuthLayout>
       <div className='w-full space-y-8'>
         <div className='space-y-2'>
-          <h2 className='text-center text-2xl font-semibold tracking-tight sm:text-left'>
+          <p className='text-xs font-black tracking-[0.18em] text-[#d36f4c] uppercase'>
             {t('Sign in')}
+          </p>
+          <h2 className='text-center text-3xl font-black tracking-tight sm:text-left'>
+            {t('回到你的 API 控制台')}
           </h2>
           {!status?.self_use_mode_enabled && (
-            <p className='text-muted-foreground text-left text-sm sm:text-base'>
-              {t("Don't have an account?")}{' '}
+            <p className='text-left text-sm text-[#75665b] sm:text-base'>
+              {t('还没有账号？')}{' '}
               <Link
                 to='/sign-up'
-                className='hover:text-primary font-medium underline underline-offset-4'
+                className='font-bold text-[#d36f4c] underline underline-offset-4 hover:text-[#9f472d]'
               >
-                {t('Sign up')}
+                {t('立即注册')}
               </Link>
               .
             </p>

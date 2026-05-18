@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
+import { getCcapiDisplayName } from '@/lib/ccapi-brand'
 import { cn } from '@/lib/utils'
 import { useSystemConfig } from '@/hooks/use-system-config'
 import {
@@ -58,6 +59,7 @@ export function SetupWizard() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const { systemName, logo, loading: systemConfigLoading } = useSystemConfig()
+  const displaySystemName = getCcapiDisplayName(systemName)
 
   const [currentStep, setCurrentStep] = useState(0)
   const [setupStatus, setSetupStatus] = useState<SetupStatus | undefined>()
@@ -272,7 +274,7 @@ export function SetupWizard() {
               <img
                 src={logo}
                 alt={t('System logo')}
-                className='h-12 w-12 rounded-full object-cover shadow-sm'
+                className='h-12 w-12 rounded-lg object-contain shadow-sm'
               />
             )}
           </div>
@@ -280,7 +282,7 @@ export function SetupWizard() {
             <Skeleton className='h-7 w-40' />
           ) : (
             <h1 className='text-2xl font-semibold tracking-tight'>
-              {t('Initialize')} {systemName}
+              {t('Initialize')} {displaySystemName}
             </h1>
           )}
           <p className='text-muted-foreground text-center text-sm sm:text-base'>

@@ -1,5 +1,9 @@
 import { useTranslation } from 'react-i18next'
 import { Separator } from '@/components/ui/separator'
+import {
+  getCcapiDisplayName,
+  getCcapiLogoForDarkSurface,
+} from '@/lib/ccapi-brand'
 import { getGatewayFeatures } from '../constants'
 
 interface GatewayCardProps {
@@ -13,6 +17,8 @@ interface GatewayCardProps {
 export function GatewayCard({ logo, systemName }: GatewayCardProps) {
   const { t } = useTranslation()
   const features = getGatewayFeatures(t)
+  const displayName = getCcapiDisplayName(systemName)
+  const displayLogo = getCcapiLogoForDarkSurface(logo)
 
   return (
     <div className='glass-3 group border-border/50 dark:border-border/20 relative overflow-hidden rounded-[32px] border p-10 shadow-2xl transition-all duration-500 sm:p-12 dark:shadow-[0_25px_80px_-15px_rgba(0,0,0,0.4)]'>
@@ -25,13 +31,15 @@ export function GatewayCard({ logo, systemName }: GatewayCardProps) {
       <div className='relative'>
         {/* Gateway Header */}
         <div className='mb-8 flex items-center justify-center gap-3'>
-          <img
-            src={logo}
-            alt={systemName}
-            className='h-12 w-12 rounded-lg object-cover'
-          />
+          <span className='flex h-12 w-12 items-center justify-center rounded-2xl p-1.5'>
+            <img
+              src={displayLogo}
+              alt={displayName}
+              className='h-full w-full rounded-lg object-contain'
+            />
+          </span>
           <h3 className='from-foreground to-foreground/70 bg-gradient-to-r bg-clip-text text-2xl font-bold text-transparent'>
-            {systemName}
+            {displayName}
           </h3>
         </div>
 
