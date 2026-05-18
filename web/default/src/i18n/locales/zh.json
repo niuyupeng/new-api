@@ -3194,6 +3194,7 @@
     "Redeemed:": "已兑换：",
     "redemption code": "兑换码",
     "Redemption Code": "兑换码",
+    "Redemption code entry is currently disabled": "兑换码入口当前未开启",
     "Redemption code entry is disabled here. Use the recharge link above if this site is configured for external recharge.": "当前站内兑换码入口未开启。如果站点配置了外部充值，请使用上方充值链接。",
     "Redemption code deleted successfully": "兑换码删除成功",
     "Redemption code disabled successfully": "兑换码已禁用",

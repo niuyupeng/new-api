@@ -16,7 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useState, useEffect } from 'react'
+import { useState, useEffect, type KeyboardEvent } from 'react'
 import { Code, Table, Plus, Trash2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
@@ -79,11 +79,25 @@ export function ModelMappingEditor({
     }
     const obj: Record<string, string> = {}
     updatedRows.forEach((row) => {
-      if (row.from.trim()) {
+      if (row.from.trim() && row.to.trim()) {
         obj[row.from.trim()] = row.to.trim()
       }
     })
+    if (Object.keys(obj).length === 0) {
+      return ''
+    }
     return JSON.stringify(obj, null, 2)
+  }
+
+  const handleMappingInputKeyDown = (
+    event: KeyboardEvent<HTMLInputElement>
+  ) => {
+    if (event.key !== 'Enter') {
+      return
+    }
+
+    event.preventDefault()
+    event.stopPropagation()
   }
 
   const handleAddRow = () => {
@@ -204,6 +218,8 @@ export function ModelMappingEditor({
                     onChange={(e) =>
                       handleRowChange(row.id, 'from', e.target.value)
                     }
+                    onKeyDown={handleMappingInputKeyDown}
+                    autoComplete='off'
                     placeholder='gpt-3.5-turbo'
                     disabled={disabled}
                   />
@@ -212,6 +228,8 @@ export function ModelMappingEditor({
                     onChange={(e) =>
                       handleRowChange(row.id, 'to', e.target.value)
                     }
+                    onKeyDown={handleMappingInputKeyDown}
+                    autoComplete='off'
                     placeholder='gpt-3.5-turbo-0125'
                     disabled={disabled}
                   />

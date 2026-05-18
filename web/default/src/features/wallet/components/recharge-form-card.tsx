@@ -554,6 +554,7 @@ export function RechargeFormCard({
               className='h-9 min-w-0'
             />
             <Button
+              type='button'
               onClick={onRedeem}
               disabled={redeeming}
               variant='outline'
@@ -579,17 +580,44 @@ export function RechargeFormCard({
           )}
         </div>
       ) : (
-        <Alert className='border-t'>
-          <AlertDescription>
-            {hasExternalTopupLink
-              ? t(
-                  'Redemption code entry is disabled here. Use the recharge link above if this site is configured for external recharge.'
-                )
-              : t(
-                  'Redemption codes are disabled until the administrator confirms compliance terms.'
-                )}
-          </AlertDescription>
-        </Alert>
+        <div className='space-y-2.5 border-t pt-4 sm:space-y-3 sm:pt-6'>
+          <div className='flex items-center gap-2'>
+            <Gift className='text-muted-foreground h-4 w-4' />
+            <Label
+              htmlFor='redemption-code-disabled'
+              className='text-muted-foreground text-xs font-medium tracking-wider uppercase'
+            >
+              {t('Have a Code?')}
+            </Label>
+          </div>
+          <div className='grid grid-cols-[minmax(0,1fr)_auto] gap-2'>
+            <Input
+              id='redemption-code-disabled'
+              disabled
+              placeholder={t('Redemption code entry is currently disabled')}
+              className='h-9 min-w-0'
+            />
+            <Button
+              type='button'
+              disabled
+              variant='outline'
+              className='h-9 px-4'
+            >
+              {t('Redeem')}
+            </Button>
+          </div>
+          <Alert>
+            <AlertDescription>
+              {hasExternalTopupLink
+                ? t(
+                    'Redemption code entry is disabled here. Use the recharge link above if this site is configured for external recharge.'
+                  )
+                : t(
+                    'Redemption codes are disabled until the administrator confirms compliance terms.'
+                  )}
+            </AlertDescription>
+          </Alert>
+        </div>
       )}
     </TitledCard>
   )
