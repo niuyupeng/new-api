@@ -50,6 +50,7 @@ import type {
   PaymentMethod,
   PresetAmount,
   CreemProduct,
+  WaffoPayMethod,
 } from './types'
 
 interface WalletProps {
@@ -234,8 +235,11 @@ export function Wallet(props: WalletProps) {
     }
   }
 
-  const handleWaffoMethodSelect = async (_method: unknown, index: number) => {
-    const loadingKey = `waffo-${index}`
+  const handleWaffoMethodSelect = async (
+    _method: WaffoPayMethod | null,
+    index?: number
+  ) => {
+    const loadingKey = index == null ? 'waffo-auto' : `waffo-${index}`
     setPaymentLoading(loadingKey)
 
     try {

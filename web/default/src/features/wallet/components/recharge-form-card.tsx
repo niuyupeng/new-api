@@ -17,7 +17,15 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { useState, useEffect } from 'react'
-import { Gift, ExternalLink, Loader2, Receipt, WalletCards } from 'lucide-react'
+import {
+  ArrowRight,
+  CreditCard,
+  ExternalLink,
+  Gift,
+  Loader2,
+  Receipt,
+  WalletCards,
+} from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { formatNumber } from '@/lib/format'
 import { cn } from '@/lib/utils'
@@ -76,7 +84,7 @@ interface RechargeFormCardProps {
   enableWaffoTopup?: boolean
   waffoPayMethods?: WaffoPayMethod[]
   waffoMinTopup?: number
-  onWaffoMethodSelect?: (method: WaffoPayMethod, index: number) => void
+  onWaffoMethodSelect?: (method: WaffoPayMethod | null, index?: number) => void
   enableWaffoPancakeTopup?: boolean
 }
 
@@ -134,6 +142,8 @@ export function RechargeFormCard({
     Array.isArray(topupInfo?.pay_methods) && topupInfo.pay_methods.length > 0
   const hasWaffoPaymentMethods =
     Array.isArray(waffoPayMethods) && waffoPayMethods.length > 0
+  const hasExternalTopupLink = !!topupLink?.trim()
+  const complianceConfirmed = topupInfo?.payment_compliance_confirmed !== false
   const minTopup = getMinTopupAmount(topupInfo)
   const redemptionEnabled = topupInfo?.enable_redemption !== false
 
@@ -206,6 +216,52 @@ export function RechargeFormCard({
       }
       contentClassName='space-y-4 sm:space-y-6'
     >
+      {hasExternalTopupLink && (
+        <div className='border-primary/20 from-primary/10 via-background to-muted/40 relative overflow-hidden rounded-xl border bg-gradient-to-br p-4 shadow-sm sm:p-5'>
+          <div className='bg-primary/10 pointer-events-none absolute top-0 right-0 h-28 w-28 translate-x-10 -translate-y-10 rounded-full blur-2xl' />
+          <div className='relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between'>
+            <div className='flex min-w-0 gap-3'>
+              <div className='bg-background/80 text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border shadow-sm'>
+                <CreditCard className='h-5 w-5' />
+              </div>
+              <div className='min-w-0 space-y-1'>
+                <div className='text-foreground text-base font-semibold'>
+                  {t('Recharge Portal')}
+                </div>
+                <p className='text-muted-foreground max-w-2xl text-sm leading-6'>
+                  {t(
+                    'Use the configured external recharge link to buy balance or redemption codes.'
+                  )}
+                </p>
+                {!complianceConfirmed && (
+                  <p className='text-muted-foreground/80 text-xs leading-5'>
+                    {t(
+                      'Payments currently use the external checkout link configured by the site owner.'
+                    )}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <Button
+              asChild
+              size='lg'
+              className='h-10 w-full gap-2 rounded-xl md:w-auto'
+            >
+              <a
+                href={topupLink}
+                target='_blank'
+                rel='noopener noreferrer'
+                aria-label={t('Open Recharge Link')}
+              >
+                {t('Open Recharge Link')}
+                <ExternalLink className='h-4 w-4' />
+              </a>
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Online Topup Section */}
       {hasAnyTopup ? (
         <div className='space-y-4 sm:space-y-6'>
@@ -362,13 +418,12 @@ export function RechargeFormCard({
                 )}
               </div>
 
-              {enableWaffoTopup &&
-                hasWaffoPaymentMethods &&
-                onWaffoMethodSelect && (
-                  <div className='space-y-2.5 sm:space-y-3'>
-                    <Label className='text-muted-foreground text-xs font-medium tracking-wider uppercase'>
-                      {t('Waffo Payment')}
-                    </Label>
+              {enableWaffoTopup && onWaffoMethodSelect && (
+                <div className='space-y-2.5 sm:space-y-3'>
+                  <Label className='text-muted-foreground text-xs font-medium tracking-wider uppercase'>
+                    {t('Waffo Payment')}
+                  </Label>
+                  {hasWaffoPaymentMethods ? (
                     <div className='grid grid-cols-2 gap-1.5 sm:gap-3 lg:grid-cols-3'>
                       {waffoPayMethods?.map((method, index) => {
                         const loadingKey = `waffo-${index}`
@@ -414,17 +469,50 @@ export function RechargeFormCard({
                         )
                       })}
                     </div>
-                  </div>
-                )}
+                  ) : (
+                    <Button
+                      variant='outline'
+                      onClick={() => onWaffoMethodSelect(null)}
+                      disabled={
+                        (waffoMinTopup || 0) > topupAmount || !!paymentLoading
+                      }
+                      className='h-auto min-h-11 w-full justify-between gap-3 rounded-xl px-4 py-3 text-left whitespace-normal'
+                    >
+                      <span className='flex min-w-0 items-center gap-3'>
+                        {paymentLoading === 'waffo-auto' ? (
+                          <Loader2 className='h-4 w-4 shrink-0 animate-spin' />
+                        ) : (
+                          getPaymentIcon('waffo', 'h-4 w-4 shrink-0')
+                        )}
+                        <span className='min-w-0'>
+                          <span className='block font-medium'>
+                            {t('Automatic Waffo checkout')}
+                          </span>
+                          <span className='text-muted-foreground block text-xs'>
+                            {t(
+                              'Let the payment provider choose the best available method.'
+                            )}
+                          </span>
+                        </span>
+                      </span>
+                      <ArrowRight className='h-4 w-4 shrink-0' />
+                    </Button>
+                  )}
+                </div>
+              )}
             </>
           )}
         </div>
       ) : (
         <Alert>
           <AlertDescription>
-            {t(
-              'Online topup is not enabled. Please use redemption code or contact administrator.'
-            )}
+            {hasExternalTopupLink
+              ? t(
+                  'Online checkout is not enabled here. Use the recharge link above, or contact support if you already paid.'
+                )
+              : t(
+                  'Online topup is not enabled. Please use redemption code or contact administrator.'
+                )}
           </AlertDescription>
         </Alert>
       )}
@@ -493,9 +581,13 @@ export function RechargeFormCard({
       ) : (
         <Alert className='border-t'>
           <AlertDescription>
-            {t(
-              'Redemption codes are disabled until the administrator confirms compliance terms.'
-            )}
+            {hasExternalTopupLink
+              ? t(
+                  'Redemption code entry is disabled here. Use the recharge link above if this site is configured for external recharge.'
+                )
+              : t(
+                  'Redemption codes are disabled until the administrator confirms compliance terms.'
+                )}
           </AlertDescription>
         </Alert>
       )}
