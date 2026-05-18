@@ -61,11 +61,6 @@ export function useSidebarData(): SidebarData {
             icon: MessageSquare,
           },
           {
-            title: t('Playground'),
-            url: '/playground',
-            icon: FlaskConical,
-          },
-          {
             title: t('External chats'),
             icon: MessageSquare,
             type: 'chat-presets',
@@ -134,6 +129,11 @@ export function useSidebarData(): SidebarData {
             title: t('Channels'),
             url: '/channels',
             icon: Radio,
+          },
+          {
+            title: t('Playground'),
+            url: '/playground',
+            icon: FlaskConical,
           },
           {
             title: t('Models'),
