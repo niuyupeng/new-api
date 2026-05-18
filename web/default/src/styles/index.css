@@ -108,6 +108,70 @@ For commercial licensing, please contact support@quantumnous.com
   background: #2a2521;
 }
 
+body:has(.ccapi-wallet-page) {
+  --background: #fff8ee;
+  --foreground: #231915;
+  --card: #fffdf8;
+  --card-foreground: #231915;
+  --popover: #fffdf8;
+  --popover-foreground: #231915;
+  --primary: #1f1713;
+  --primary-foreground: #fff4df;
+  --secondary: #f4e7d5;
+  --secondary-foreground: #2a201a;
+  --muted: #f4e9da;
+  --muted-foreground: #75675d;
+  --accent: #f2dfc5;
+  --accent-foreground: #2a201a;
+  --border: #ead9c1;
+  --input: #ead9c1;
+  --ring: #d9704d;
+  --sidebar: #fff4e6;
+  --sidebar-foreground: #2a201a;
+  --sidebar-primary: #1f1713;
+  --sidebar-primary-foreground: #fff4df;
+  --sidebar-accent: #f4e5d1;
+  --sidebar-accent-foreground: #231915;
+  --sidebar-border: #ead8c1;
+  --sidebar-ring: #d9704d;
+}
+
+body:has(.ccapi-wallet-page) [data-slot='sidebar-wrapper'] {
+  background:
+    radial-gradient(circle at 18% 10%, rgba(238, 120, 79, 0.12), transparent 30%),
+    #fff8ee;
+}
+
+body:has(.ccapi-wallet-page) [data-slot='sidebar-inner'] {
+  border-right: 1px solid rgba(176, 130, 87, 0.24);
+  background: rgba(255, 247, 235, 0.94);
+}
+
+body:has(.ccapi-wallet-page) [data-slot='sidebar-inset'] {
+  background:
+    linear-gradient(180deg, rgba(255, 249, 239, 0.96), rgba(255, 244, 230, 0.92)),
+    radial-gradient(circle at 78% 0%, rgba(238, 120, 79, 0.16), transparent 34%);
+}
+
+body:has(.ccapi-wallet-page) [data-slot='card'] {
+  border-color: rgba(176, 130, 87, 0.2);
+  background: rgba(255, 253, 248, 0.92);
+  box-shadow: 0 20px 60px -42px rgba(92, 56, 28, 0.55);
+}
+
+body:has(.ccapi-wallet-page) [data-slot='button'] {
+  border-color: rgba(176, 130, 87, 0.28);
+}
+
+body:has(.ccapi-wallet-page) input {
+  background: rgba(255, 253, 248, 0.9);
+}
+
+body:has(.ccapi-wallet-page) input:disabled {
+  background: rgba(244, 232, 215, 0.72);
+  color: rgba(117, 103, 93, 0.72);
+}
+
 .ccapi-pricing-page main > div,
 .ccapi-pricing-page aside,
 .ccapi-pricing-page [class*='rounded-xl'][class*='border'] {
