@@ -41,7 +41,6 @@ import {
 import { Textarea } from '@/components/ui/textarea'
 import { Response } from '@/components/ai-elements/response'
 import { getUserGroups, getUserModels } from '@/features/playground/api'
-import { DEFAULT_GROUP } from '@/features/playground/constants'
 import { getTopupInfo } from '@/features/wallet/api'
 import {
   getChatConsoleSelf,
@@ -74,11 +73,13 @@ const STORAGE_KEYS = {
   defaultImageModel: 'ccapi_default_image_model',
 } as const
 
+const ACCOUNT_DEFAULT_GROUP = ''
+
 const DEFAULT_SETTINGS: ChatConsoleSettings = {
   model: 'gpt-5.3-codex-spark',
   imageModel: 'gpt-image-2',
   imageAdapter: 'auto',
-  group: DEFAULT_GROUP,
+  group: ACCOUNT_DEFAULT_GROUP,
   temperature: 0.7,
   topP: 1,
   maxTokens: 4096,
@@ -190,9 +191,18 @@ function readText(key: string): string {
 function readSettings(): ChatConsoleSettings {
   const localChatModel = readText(STORAGE_KEYS.defaultChatModel)
   const localImageModel = readText(STORAGE_KEYS.defaultImageModel)
+  const storedSettings = readJson<Partial<ChatConsoleSettings>>(
+    STORAGE_KEYS.settings,
+    {}
+  )
+  // Older chat-console builds defaulted to "default", which can be a
+  // forbidden token group for paid users. Empty means "use account group".
+  if (storedSettings.group === 'default') {
+    storedSettings.group = ACCOUNT_DEFAULT_GROUP
+  }
   return {
     ...DEFAULT_SETTINGS,
-    ...readJson<Partial<ChatConsoleSettings>>(STORAGE_KEYS.settings, {}),
+    ...storedSettings,
     ...(localChatModel ? { model: localChatModel } : {}),
     ...(localImageModel ? { imageModel: localImageModel } : {}),
   }
@@ -487,6 +497,12 @@ export function ChatConsole(props: ChatConsoleProps) {
     queryFn: getUserGroups,
   })
 
+  const selectedRequestGroup = useMemo(() => {
+    if (!settings.group) return undefined
+    const canUseGroup = groups.some((group) => group.value === settings.group)
+    return canUseGroup ? settings.group : undefined
+  }, [groups, settings.group])
+
   const imageModelOptions = useMemo(() => {
     const candidates = models
       .filter((model) => isLikelyImageModelName(model.value))
@@ -521,6 +537,13 @@ export function ChatConsole(props: ChatConsoleProps) {
     if (hasChatModel) return
     setSettings((prev) => ({ ...prev, model: models[0].value }))
   }, [models, settings.model])
+
+  useEffect(() => {
+    if (!settings.group || groups.length === 0) return
+    const canUseGroup = groups.some((group) => group.value === settings.group)
+    if (canUseGroup) return
+    setSettings((prev) => ({ ...prev, group: ACCOUNT_DEFAULT_GROUP }))
+  }, [groups, settings.group])
 
   const updateActiveSession = useCallback(
     (updater: (session: ChatSession) => ChatSession) => {
@@ -697,7 +720,7 @@ export function ChatConsole(props: ChatConsoleProps) {
 
       const payload = {
         model: settings.model,
-        group: settings.group,
+        group: selectedRequestGroup,
         messages: buildMessages(nextMessages),
         stream: settings.stream,
         temperature: settings.temperature,
@@ -769,14 +792,14 @@ export function ChatConsole(props: ChatConsoleProps) {
       isGenerating,
       isModelsLoading,
       models.length,
-      settings.group,
       settings.maxTokens,
       settings.model,
+      selectedRequestGroup,
       settings.stream,
       settings.temperature,
       settings.topP,
-      t,
       updateMessage,
+      t,
     ]
   )
 
@@ -818,7 +841,7 @@ export function ChatConsole(props: ChatConsoleProps) {
           const response = await sendChatImageGeneration(
             {
               model: settings.imageModel,
-              group: settings.group,
+              group: selectedRequestGroup,
               messages: [
                 {
                   role: 'user',
@@ -890,7 +913,7 @@ export function ChatConsole(props: ChatConsoleProps) {
         setIsGenerating(false)
       }
     },
-    [appendMessage, isGenerating, settings, updateMessage]
+    [appendMessage, isGenerating, selectedRequestGroup, settings, updateMessage]
   )
 
   const handleRegenerate = useCallback(() => {
@@ -1444,7 +1467,9 @@ export function ChatConsole(props: ChatConsoleProps) {
                       }
                       className='w-full rounded-lg border border-[#ead9c1] bg-[#fffaf3] px-2 py-1 text-[#1b1511] focus:border-[#d36f4c]'
                     >
-                      <option value={DEFAULT_GROUP}>{t('Auto')}</option>
+                      <option value={ACCOUNT_DEFAULT_GROUP}>
+                        {t('Account default')}
+                      </option>
                       {groups.map((group) => (
                         <option key={group.value} value={group.value}>
                           {group.label}
