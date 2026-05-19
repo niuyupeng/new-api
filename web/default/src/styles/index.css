@@ -172,28 +172,48 @@ body:has(.ccapi-wallet-page) input:disabled {
   color: rgba(117, 103, 93, 0.72);
 }
 
+body:has(.ccapi-pricing-page) {
+  --background: #fff8ee;
+  --foreground: #211712;
+  --card: #fffdf8;
+  --card-foreground: #211712;
+  --popover: #fffdf8;
+  --popover-foreground: #211712;
+  --primary: #211712;
+  --primary-foreground: #fff7eb;
+  --secondary: #f5ebdd;
+  --secondary-foreground: #211712;
+  --muted: #f5ebdd;
+  --muted-foreground: #6f6257;
+  --accent: #f0dfc8;
+  --accent-foreground: #211712;
+  --border: #ead9c1;
+  --input: #ead9c1;
+  --ring: #c95f3f;
+}
+
 .ccapi-pricing-page main > div,
 .ccapi-pricing-page aside,
 .ccapi-pricing-page [class*='rounded-xl'][class*='border'] {
-  border-color: rgba(255, 255, 255, 0.1);
-  background-color: rgba(255, 255, 255, 0.045);
+  border-color: #ead9c1;
+  background-color: rgba(255, 253, 248, 0.92);
 }
 
 .ccapi-pricing-page table,
 .ccapi-pricing-page thead,
 .ccapi-pricing-page tbody,
 .ccapi-pricing-page [role='table'] {
-  color: #fff3df;
+  color: #211712;
 }
 
 .ccapi-pricing-page input {
-  border-color: rgba(255, 255, 255, 0.14);
-  background: rgba(9, 8, 7, 0.78);
-  color: #fff3df;
+  border-color: #d9c5aa;
+  background: #fffdf8;
+  color: #211712;
 }
 
 .ccapi-pricing-page input::placeholder {
-  color: rgba(255, 243, 223, 0.46);
+  color: #8a7a6b;
 }
 
 /* Vercel Geist-style skeleton shimmer */

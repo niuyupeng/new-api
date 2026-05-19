@@ -135,7 +135,7 @@ export function Pricing() {
         siteName='ccapi'
         headerProps={{ className: 'ccapi-public-header' }}
       >
-        <div className='min-h-svh bg-[#11100f] px-3 pt-24 pb-8 sm:px-6 sm:pt-28 sm:pb-10 xl:px-8'>
+        <div className='min-h-svh bg-[#fff8ee] px-3 pt-24 pb-8 sm:px-6 sm:pt-28 sm:pb-10 xl:px-8'>
           <LoadingSkeleton viewMode={viewMode} />
         </div>
       </PublicLayout>
@@ -149,38 +149,28 @@ export function Pricing() {
       siteName='ccapi'
       headerProps={{ className: 'ccapi-public-header' }}
     >
-      <div className='ccapi-pricing-page relative min-h-svh overflow-hidden bg-[#0f0f0e] text-[#fff6e8]'>
-        <div
-          aria-hidden
-          className='pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_80%_10%,rgba(242,139,97,0.16),transparent_28%),radial-gradient(circle_at_10%_18%,rgba(45,142,156,0.1),transparent_25%)]'
-        />
-        <div
-          aria-hidden
-          className='absolute inset-0 [background-image:linear-gradient(to_right,#fff_1px,transparent_1px),linear-gradient(to_bottom,#fff_1px,transparent_1px)] [background-size:42px_42px] opacity-[0.025]'
-        />
-        <PageTransition className='relative mx-auto w-full max-w-[1800px] px-3 pt-24 pb-8 sm:px-6 sm:pt-28 sm:pb-10 xl:px-8'>
-          <header className='mx-auto mb-8 grid max-w-6xl gap-6 pt-4 lg:grid-cols-[1fr_0.68fr] lg:items-end'>
+      <div className='ccapi-pricing-page min-h-svh bg-[#fff8ee] text-[#211712]'>
+        <PageTransition className='mx-auto w-full max-w-[1800px] px-3 pt-24 pb-8 sm:px-6 sm:pt-28 sm:pb-10 xl:px-8'>
+          <header className='mx-auto mb-6 grid max-w-6xl gap-5 pt-4 lg:grid-cols-[1fr_0.72fr] lg:items-end'>
             <div>
-              <p className='mb-4 inline-flex rounded-full border border-[#f28b61]/35 bg-[#2a1712]/80 px-3 py-1.5 text-xs font-black tracking-[0.16em] text-[#f28b61] uppercase'>
-                {t('MODEL MENU')}
+              <p className='mb-3 text-sm font-bold text-[#c95f3f]'>
+                {t('模型价格表')}
               </p>
-              <h1 className='max-w-3xl text-[clamp(2.7rem,6.2vw,5.35rem)] leading-[0.95] font-black tracking-normal text-[#fff6e8]'>
+              <h1 className='max-w-3xl text-4xl leading-tight font-black tracking-tight text-[#211712] md:text-5xl'>
                 {t('模型价格')}
-                <br />
-                <span className='text-[#f28b61]'>{t('明码标价')}</span>
               </h1>
-              <p className='mt-5 max-w-2xl text-sm leading-7 text-[#f0dfc8] sm:text-base'>
+              <p className='mt-4 max-w-2xl text-sm leading-7 text-[#6f6257] sm:text-base'>
                 {t(
-                  '当前可用 {{count}} 个模型。搜索模型、供应商、端点或标签，像看菜单一样快速比较输入、输出和请求价格。',
+                  '当前可用 {{count}} 个模型。搜索模型名、供应商、端点或标签，快速比较输入价、输出价、缓存价和按次价格。',
                   {
                     count: models?.length || 0,
                   }
                 )}
               </p>
             </div>
-            <div className='ccapi-pricing-search-panel rounded-xl border border-[#4c3930] bg-[#1b1714]/95 p-4 shadow-[0_24px_80px_rgba(0,0,0,0.35)]'>
-              <div className='mb-3 text-xs font-black tracking-[0.16em] text-[#ff9b70] uppercase'>
-                quick search
+            <div className='ccapi-pricing-search-panel rounded-xl border border-[#ead9c1] bg-white p-4 shadow-sm'>
+              <div className='mb-3 text-sm font-bold text-[#4c4037]'>
+                {t('快速搜索')}
               </div>
               <SearchBar
                 value={searchInput}
@@ -192,17 +182,17 @@ export function Pricing() {
                 className='ccapi-pricing-search'
               />
               <div className='mt-4 grid grid-cols-3 gap-2 text-center text-xs'>
-                <div className='ccapi-pricing-stat rounded-md bg-[#090807] px-2 py-3'>
-                  <div className='font-black text-[#ff9b70]'>/1M</div>
-                  <div className='mt-1 text-[#ead7bf]'>{t('Token')}</div>
+                <div className='ccapi-pricing-stat rounded-md border border-[#ead9c1] bg-[#fff8ee] px-2 py-3'>
+                  <div className='font-black text-[#211712]'>/1M</div>
+                  <div className='mt-1 text-[#6f6257]'>{t('Token')}</div>
                 </div>
-                <div className='ccapi-pricing-stat rounded-md bg-[#090807] px-2 py-3'>
-                  <div className='font-black text-[#ff9b70]'>CNY</div>
-                  <div className='mt-1 text-[#ead7bf]'>{t('Recharge')}</div>
+                <div className='ccapi-pricing-stat rounded-md border border-[#ead9c1] bg-[#fff8ee] px-2 py-3'>
+                  <div className='font-black text-[#211712]'>CNY</div>
+                  <div className='mt-1 text-[#6f6257]'>{t('Recharge')}</div>
                 </div>
-                <div className='ccapi-pricing-stat rounded-md bg-[#090807] px-2 py-3'>
-                  <div className='font-black text-[#ff9b70]'>API</div>
-                  <div className='mt-1 text-[#ead7bf]'>{t('Ready')}</div>
+                <div className='ccapi-pricing-stat rounded-md border border-[#ead9c1] bg-[#fff8ee] px-2 py-3'>
+                  <div className='font-black text-[#211712]'>API</div>
+                  <div className='mt-1 text-[#6f6257]'>{t('Ready')}</div>
                 </div>
               </div>
             </div>
