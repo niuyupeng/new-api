@@ -74,9 +74,11 @@ const STORAGE_KEYS = {
 } as const
 
 const ACCOUNT_DEFAULT_GROUP = ''
+const DEFAULT_CHAT_MODEL = 'LongCat-Flash-Chat'
+const LEGACY_DEFAULT_CHAT_MODEL = 'gpt-5.3-codex-spark'
 
 const DEFAULT_SETTINGS: ChatConsoleSettings = {
-  model: 'gpt-5.3-codex-spark',
+  model: DEFAULT_CHAT_MODEL,
   imageModel: 'gpt-image-2',
   imageAdapter: 'auto',
   group: ACCOUNT_DEFAULT_GROUP,
@@ -189,7 +191,11 @@ function readText(key: string): string {
 }
 
 function readSettings(): ChatConsoleSettings {
-  const localChatModel = readText(STORAGE_KEYS.defaultChatModel)
+  const rawLocalChatModel = readText(STORAGE_KEYS.defaultChatModel)
+  const localChatModel =
+    rawLocalChatModel === LEGACY_DEFAULT_CHAT_MODEL
+      ? DEFAULT_CHAT_MODEL
+      : rawLocalChatModel
   const localImageModel = readText(STORAGE_KEYS.defaultImageModel)
   const storedSettings = readJson<Partial<ChatConsoleSettings>>(
     STORAGE_KEYS.settings,
@@ -199,6 +205,9 @@ function readSettings(): ChatConsoleSettings {
   // forbidden token group for paid users. Empty means "use account group".
   if (storedSettings.group === 'default') {
     storedSettings.group = ACCOUNT_DEFAULT_GROUP
+  }
+  if (storedSettings.model === LEGACY_DEFAULT_CHAT_MODEL) {
+    storedSettings.model = DEFAULT_CHAT_MODEL
   }
   return {
     ...DEFAULT_SETTINGS,
@@ -440,7 +449,11 @@ export function ChatConsole(props: ChatConsoleProps) {
   const [sessions, setSessions] = useState<ChatSession[]>(() => {
     const stored = readJson<ChatSession[]>(STORAGE_KEYS.sessions, [])
     return stored.length > 0
-      ? stored
+      ? stored.map((session) =>
+          session.model === LEGACY_DEFAULT_CHAT_MODEL
+            ? { ...session, model: DEFAULT_CHAT_MODEL }
+            : session
+        )
       : [
           createSession(
             initialMode,
