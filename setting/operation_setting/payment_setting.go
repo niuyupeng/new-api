@@ -3,8 +3,10 @@ package operation_setting
 import "github.com/QuantumNous/new-api/setting/config"
 
 type PaymentSetting struct {
-	AmountOptions  []int           `json:"amount_options"`
-	AmountDiscount map[int]float64 `json:"amount_discount"` // 充值金额对应的折扣，例如 100 元 0.9 表示 100 元充值享受 9 折优惠
+	AmountOptions                []int           `json:"amount_options"`
+	AmountDiscount               map[int]float64 `json:"amount_discount"`                  // 充值金额对应的折扣，例如 100 元 0.9 表示 100 元充值享受 9 折优惠
+	InviteeFirstTopupDiscount    float64         `json:"invitee_first_topup_discount"`     // 受邀用户首充折扣，例如 0.9 表示 9 折；1 表示不启用
+	InviteeFirstTopupDiscountMin int             `json:"invitee_first_topup_discount_min"` // 受邀用户首充折扣最低充值金额，0 表示不限
 
 	ComplianceConfirmed    bool   `json:"compliance_confirmed"`
 	ComplianceTermsVersion string `json:"compliance_terms_version"`
@@ -17,8 +19,9 @@ const CurrentComplianceTermsVersion = "v1"
 
 // 默认配置
 var paymentSetting = PaymentSetting{
-	AmountOptions:  []int{10, 20, 50, 100, 200, 500},
-	AmountDiscount: map[int]float64{},
+	AmountOptions:             []int{10, 20, 50, 100, 200, 500},
+	AmountDiscount:            map[int]float64{},
+	InviteeFirstTopupDiscount: 1,
 }
 
 func init() {

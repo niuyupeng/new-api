@@ -193,9 +193,9 @@ function copy(text: string) {
 
 function CodeBlock(props: CodeExample) {
   return (
-    <article className='rounded-lg border border-[#ead9c1] bg-white p-4 shadow-sm'>
-      <div className='mb-3 flex items-start justify-between gap-3'>
-        <div>
+    <article className='min-w-0 overflow-hidden rounded-lg border border-[#ead9c1] bg-white p-3 shadow-sm sm:p-4'>
+      <div className='mb-3 flex flex-col items-start justify-between gap-3 sm:flex-row'>
+        <div className='min-w-0'>
           <h3 className='font-bold text-[#211712]'>{props.title}</h3>
           <p className='mt-1 text-sm leading-6 text-[#6f6257]'>{props.desc}</p>
         </div>
@@ -210,8 +210,8 @@ function CodeBlock(props: CodeExample) {
           复制
         </Button>
       </div>
-      <pre className='overflow-x-auto rounded-md bg-[#171412] p-4 text-xs leading-6 text-[#fff7eb]'>
-        <code>{props.code}</code>
+      <pre className='max-w-full overflow-x-auto rounded-md bg-[#171412] p-3 text-xs leading-6 text-[#fff7eb] sm:p-4'>
+        <code className='block min-w-full w-max'>{props.code}</code>
       </pre>
     </article>
   )
@@ -250,14 +250,14 @@ export function ApiDocs() {
       siteName='ccapi'
       headerProps={{ className: 'ccapi-public-header' }}
     >
-      <main className='min-h-svh bg-[#fff8ee] pt-24 text-[#211712]'>
-        <section className='border-b border-[#ead9c1] px-5 py-10 md:px-8'>
+      <main className='ccapi-docs-page min-h-svh overflow-x-clip bg-[#fff8ee] pt-24 text-[#211712]'>
+        <section className='border-b border-[#ead9c1] px-4 py-10 sm:px-5 md:px-8'>
           <div className='mx-auto max-w-6xl'>
             <div className='max-w-3xl'>
               <p className='mb-3 text-sm font-bold text-[#c95f3f]'>
                 接入文档
               </p>
-              <h1 className='text-4xl font-black tracking-tight md:text-5xl'>
+              <h1 className='text-3xl font-black tracking-tight sm:text-4xl md:text-5xl'>
                 按步骤填，不绕弯。
               </h1>
               <p className='mt-4 text-base leading-8 text-[#6f6257]'>
@@ -266,8 +266,8 @@ export function ApiDocs() {
               </p>
             </div>
 
-            <div className='mt-8 grid gap-3 md:grid-cols-2'>
-              <div className='rounded-lg border border-[#ead9c1] bg-white p-4'>
+            <div className='mt-8 grid min-w-0 gap-3 md:grid-cols-2'>
+              <div className='min-w-0 rounded-lg border border-[#ead9c1] bg-white p-4'>
                 <div className='mb-2 flex items-center gap-2 font-bold'>
                   <Terminal className='size-4 text-[#c95f3f]' />
                   OpenAI 兼容地址
@@ -286,7 +286,7 @@ export function ApiDocs() {
                 </Button>
               </div>
 
-              <div className='rounded-lg border border-[#ead9c1] bg-white p-4'>
+              <div className='min-w-0 rounded-lg border border-[#ead9c1] bg-white p-4'>
                 <div className='mb-2 flex items-center gap-2 font-bold'>
                   <Bot className='size-4 text-[#c95f3f]' />
                   Claude / Anthropic 地址
@@ -309,7 +309,7 @@ export function ApiDocs() {
           </div>
         </section>
 
-        <section className='px-5 py-10 md:px-8'>
+        <section className='px-4 py-10 sm:px-5 md:px-8'>
           <div className='mx-auto max-w-6xl'>
             <SectionTitle
               icon={CheckCircle2}
@@ -356,7 +356,7 @@ export function ApiDocs() {
           </div>
         </section>
 
-        <section className='border-y border-[#ead9c1] bg-[#fffdf8] px-5 py-10 md:px-8'>
+        <section className='border-y border-[#ead9c1] bg-[#fffdf8] px-4 py-10 sm:px-5 md:px-8'>
           <div className='mx-auto max-w-6xl'>
             <SectionTitle
               icon={Wrench}
@@ -364,7 +364,7 @@ export function ApiDocs() {
               title='不同工具只差 Base URL'
               desc='最容易填错的是 Claude Code：它填根域名。OpenAI 兼容工具才填 /v1。'
             />
-            <div className='overflow-hidden rounded-lg border border-[#ead9c1] bg-white'>
+            <div className='min-w-0 overflow-hidden rounded-lg border border-[#ead9c1] bg-white'>
               <div className='grid grid-cols-[1.1fr_1fr_0.85fr_1.2fr] border-b border-[#ead9c1] bg-[#f5ebdd] px-4 py-3 text-sm font-bold text-[#4c4037] max-lg:hidden'>
                 <div>工具</div>
                 <div>地址</div>
@@ -374,7 +374,7 @@ export function ApiDocs() {
               {toolGuides.map((tool) => (
                 <div
                   key={tool.name}
-                  className='grid gap-2 border-b border-[#ead9c1] px-4 py-4 text-sm last:border-b-0 lg:grid-cols-[1.1fr_1fr_0.85fr_1.2fr] lg:items-center'
+                  className='grid min-w-0 gap-2 border-b border-[#ead9c1] px-4 py-4 text-sm last:border-b-0 lg:grid-cols-[1.1fr_1fr_0.85fr_1.2fr] lg:items-center'
                 >
                   <div className='font-bold'>{tool.name}</div>
                   <div>
@@ -397,7 +397,7 @@ export function ApiDocs() {
           </div>
         </section>
 
-        <section className='px-5 py-10 md:px-8'>
+        <section className='px-4 py-10 sm:px-5 md:px-8'>
           <div className='mx-auto max-w-6xl'>
             <SectionTitle
               icon={MessageSquareText}
@@ -405,7 +405,7 @@ export function ApiDocs() {
               title='OpenAI-compatible 聊天'
               desc='URL、Key、model 三个地方填对，基本就能跑。'
             />
-            <div className='grid gap-4 lg:grid-cols-3'>
+            <div className='grid min-w-0 gap-4 lg:grid-cols-3'>
               {chatExamples.map((example) => (
                 <CodeBlock key={example.title} {...example} />
               ))}
@@ -413,7 +413,7 @@ export function ApiDocs() {
           </div>
         </section>
 
-        <section className='border-y border-[#ead9c1] bg-[#fffdf8] px-5 py-10 md:px-8'>
+        <section className='border-y border-[#ead9c1] bg-[#fffdf8] px-4 py-10 sm:px-5 md:px-8'>
           <div className='mx-auto max-w-6xl'>
             <SectionTitle
               icon={ImageIcon}
@@ -421,7 +421,7 @@ export function ApiDocs() {
               title='生图有两种走法'
               desc='gpt-image、imagen 通常走 Images API；nano banana、Gemini image preview 通常走 Chat 生图。以模型价格页和后台渠道配置为准。'
             />
-            <div className='grid gap-4 lg:grid-cols-2'>
+            <div className='grid min-w-0 gap-4 lg:grid-cols-2'>
               {imageExamples.map((example) => (
                 <CodeBlock key={example.title} {...example} />
               ))}
@@ -429,7 +429,7 @@ export function ApiDocs() {
           </div>
         </section>
 
-        <section className='px-5 py-10 md:px-8'>
+        <section className='px-4 py-10 sm:px-5 md:px-8'>
           <div className='mx-auto max-w-6xl'>
             <SectionTitle
               icon={Command}
@@ -445,7 +445,7 @@ export function ApiDocs() {
           </div>
         </section>
 
-        <section className='border-t border-[#ead9c1] bg-[#fffdf8] px-5 py-10 md:px-8'>
+        <section className='border-t border-[#ead9c1] bg-[#fffdf8] px-4 py-10 sm:px-5 md:px-8'>
           <div className='mx-auto max-w-6xl'>
             <SectionTitle
               icon={AlertTriangle}

@@ -249,6 +249,10 @@ export function QuotaSettingsSection({
                 </FormControl>
                 <FormDescription>
                   {t('External link for users to purchase quota')}
+                  <br />
+                  {t(
+                    'Supports placeholders: {aff}, {invite_code}, {discount_rate}, {discount_percent}, {discount_type}, {min_amount}.'
+                  )}
                 </FormDescription>
                 <FormMessage />
               </FormItem>

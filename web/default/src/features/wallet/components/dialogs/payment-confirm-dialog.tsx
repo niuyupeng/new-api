@@ -32,7 +32,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton'
 import { DEFAULT_DISCOUNT_RATE } from '../../constants'
 import { formatCurrency, getPaymentIcon } from '../../lib'
-import type { PaymentMethod } from '../../types'
+import type { PaymentMethod, TopupDiscountType } from '../../types'
 
 interface PaymentConfirmDialogProps {
   open: boolean
@@ -44,6 +44,7 @@ interface PaymentConfirmDialogProps {
   calculating: boolean
   processing: boolean
   discountRate?: number
+  discountType?: TopupDiscountType
   usdExchangeRate?: number
 }
 
@@ -57,12 +58,17 @@ export function PaymentConfirmDialog({
   calculating,
   processing,
   discountRate = DEFAULT_DISCOUNT_RATE,
+  discountType,
   usdExchangeRate = 1,
 }: PaymentConfirmDialogProps) {
   const { t } = useTranslation()
   const hasDiscount = discountRate > 0 && discountRate < 1 && paymentAmount > 0
   const originalAmount = hasDiscount ? paymentAmount / discountRate : 0
   const discountAmount = hasDiscount ? originalAmount - paymentAmount : 0
+  const isInviteDiscount = discountType === 'invitee_first_topup'
+  const discountLabel = isInviteDiscount
+    ? t('Invitation first top-up discount')
+    : t('You save')
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -113,11 +119,18 @@ export function PaymentConfirmDialog({
           {hasDiscount && !calculating && (
             <div className='bg-muted/50 rounded-lg p-3'>
               <div className='flex items-center justify-between text-sm'>
-                <span className='text-muted-foreground'>{t('You save')}</span>
+                <span className='text-muted-foreground'>{discountLabel}</span>
                 <span className='font-semibold text-green-600'>
                   {formatCurrency(discountAmount)}
                 </span>
               </div>
+              {isInviteDiscount && (
+                <p className='text-muted-foreground mt-2 text-xs leading-5'>
+                  {t(
+                    'This invite discount is consumed after this payment succeeds.'
+                  )}
+                </p>
+              )}
             </div>
           )}
 

@@ -148,6 +148,10 @@ const BILLING_SECTIONS = [
           PayMethods: settings.PayMethods,
           AmountOptions: settings['payment_setting.amount_options'],
           AmountDiscount: settings['payment_setting.amount_discount'],
+          InviteeFirstTopupDiscount:
+            settings['payment_setting.invitee_first_topup_discount'],
+          InviteeFirstTopupDiscountMin:
+            settings['payment_setting.invitee_first_topup_discount_min'],
           StripeApiSecret: settings.StripeApiSecret,
           StripeWebhookSecret: settings.StripeWebhookSecret,
           StripePriceId: settings.StripePriceId,

@@ -216,6 +216,22 @@ body:has(.ccapi-pricing-page) {
   color: #8a7a6b;
 }
 
+.ccapi-docs-page,
+.ccapi-pricing-page {
+  overflow-wrap: anywhere;
+}
+
+.ccapi-docs-page pre,
+.ccapi-docs-page code {
+  max-width: 100%;
+}
+
+@media (max-width: 640px) {
+  .ccapi-docs-page pre {
+    font-size: 0.72rem;
+  }
+}
+
 /* Vercel Geist-style skeleton shimmer */
 .skeleton-shimmer {
   background: linear-gradient(

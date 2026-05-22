@@ -111,6 +111,32 @@ export interface WaffoPayMethod {
   payMethodName?: string
 }
 
+export type TopupDiscountType = 'amount' | 'invitee_first_topup'
+
+/**
+ * Invitation discount state returned by the server.
+ */
+export interface InviteDiscountInfo {
+  /** Whether the current user was registered through an invitation */
+  bound: boolean
+  /** Whether the first top-up discount can be used now */
+  eligible: boolean
+  /** Final price multiplier, e.g. 0.9 means 10% off */
+  discount_rate: number
+  /** Human readable discount percent, e.g. 10 means 10% off */
+  discount_percent?: number
+  /** Server-side discount identifier */
+  discount_type?: TopupDiscountType | string
+  /** Inviter code that can be carried to external recharge portals */
+  invite_code?: string
+  /** Whether a successful top-up has already consumed the first top-up offer */
+  first_topup_used?: boolean
+  /** Whether a pending top-up temporarily blocks another first top-up offer */
+  has_pending?: boolean
+  /** Minimum amount required for the invite discount */
+  min_amount?: number
+}
+
 /**
  * Topup configuration information
  */
@@ -129,6 +155,8 @@ export interface TopupInfo {
   amount_options: number[]
   /** Discount rates by amount */
   discount: Record<number, number>
+  /** Invitation first top-up discount state */
+  invite_discount?: InviteDiscountInfo
   /** Optional topup link for purchasing codes */
   topup_link?: string
   /** Whether Creem topup is enabled */

@@ -156,7 +156,7 @@ export function Pricing() {
               <p className='mb-3 text-sm font-bold text-[#c95f3f]'>
                 {t('模型价格表')}
               </p>
-              <h1 className='max-w-3xl text-4xl leading-tight font-black tracking-tight text-[#211712] md:text-5xl'>
+              <h1 className='max-w-3xl text-3xl leading-tight font-black tracking-tight text-[#211712] sm:text-4xl md:text-5xl'>
                 {t('模型价格')}
               </h1>
               <p className='mt-4 max-w-2xl text-sm leading-7 text-[#6f6257] sm:text-base'>
@@ -168,7 +168,7 @@ export function Pricing() {
                 )}
               </p>
             </div>
-            <div className='ccapi-pricing-search-panel rounded-xl border border-[#ead9c1] bg-white p-4 shadow-sm'>
+            <div className='ccapi-pricing-search-panel min-w-0 rounded-xl border border-[#ead9c1] bg-white p-4 shadow-sm'>
               <div className='mb-3 text-sm font-bold text-[#4c4037]'>
                 {t('快速搜索')}
               </div>

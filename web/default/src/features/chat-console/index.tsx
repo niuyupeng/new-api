@@ -483,13 +483,18 @@ export function ChatConsole(props: ChatConsoleProps) {
     select: (response) => response.data ?? null,
   })
 
+  const effectiveModelGroup = useMemo(() => {
+    if (settings.group) return settings.group
+    return user?.group || undefined
+  }, [settings.group, user?.group])
+
   const {
     data: models = [],
     isLoading: isModelsLoading,
     isError: isModelsError,
   } = useQuery({
-    queryKey: ['chat-console-models'],
-    queryFn: getUserModels,
+    queryKey: ['chat-console-models', effectiveModelGroup ?? 'all'],
+    queryFn: () => getUserModels(effectiveModelGroup),
   })
 
   const { data: groups = [] } = useQuery({
@@ -523,6 +528,10 @@ export function ChatConsole(props: ChatConsoleProps) {
     return Array.from(optionMap.values())
   }, [models, settings.imageModel])
 
+  const isSelectedChatModelAvailable = useMemo(() => {
+    return models.some((model) => model.value === settings.model)
+  }, [models, settings.model])
+
   useEffect(() => writeJson(STORAGE_KEYS.sessions, sessions), [sessions])
   useEffect(() => writeJson(STORAGE_KEYS.gallery, gallery), [gallery])
   useEffect(() => writeJson(STORAGE_KEYS.settings, settings), [settings])
@@ -537,6 +546,11 @@ export function ChatConsole(props: ChatConsoleProps) {
     if (hasChatModel) return
     setSettings((prev) => ({ ...prev, model: models[0].value }))
   }, [models, settings.model])
+
+  useEffect(() => {
+    if (!settings.group || isModelsLoading || models.length > 0) return
+    setSettings((prev) => ({ ...prev, group: ACCOUNT_DEFAULT_GROUP }))
+  }, [isModelsLoading, models.length, settings.group])
 
   useEffect(() => {
     if (!settings.group || groups.length === 0) return
@@ -668,26 +682,40 @@ export function ChatConsole(props: ChatConsoleProps) {
     [activeSessionId, mode, settings.imageModel, settings.model]
   )
 
-  const handleRenameSession = useCallback((id: string) => {
-    setSessions((prev) =>
-      prev.map((session) =>
-        session.id === id
-          ? {
-              ...session,
-              title: titleFromPrompt(
-                window.prompt('重命名会话', session.title) ?? session.title
-              ),
-              updatedAt: Date.now(),
-            }
-          : session
+  const handleRenameSession = useCallback(
+    (id: string) => {
+      setSessions((prev) =>
+        prev.map((session) =>
+          session.id === id
+            ? {
+                ...session,
+                title: titleFromPrompt(
+                  window.prompt(t('Rename session'), session.title) ??
+                    session.title
+                ),
+                updatedAt: Date.now(),
+              }
+            : session
+        )
       )
-    )
-  }, [])
+    },
+    [t]
+  )
 
   const handleChatSubmit = useCallback(
     async (prompt: string) => {
       if (!activeSession || isGenerating) return
+      if (isModelsLoading) {
+        toast.error(t('Checking API'))
+        return
+      }
       if (!isModelsLoading && models.length === 0) {
+        toast.error(
+          t('No available chat models. Add a channel and enable a model first.')
+        )
+        return
+      }
+      if (!isSelectedChatModelAvailable) {
         toast.error(
           t('No available chat models. Add a channel and enable a model first.')
         )
@@ -791,6 +819,7 @@ export function ChatConsole(props: ChatConsoleProps) {
       appendMessage,
       isGenerating,
       isModelsLoading,
+      isSelectedChatModelAvailable,
       models.length,
       settings.maxTokens,
       settings.model,
@@ -819,7 +848,7 @@ export function ChatConsole(props: ChatConsoleProps) {
         id: assistantId,
         role: 'assistant',
         mode: 'image',
-        content: '正在生成图片...',
+        content: t('Generating image...'),
         status: 'streaming',
         createdAt: Date.now(),
       }
@@ -913,7 +942,14 @@ export function ChatConsole(props: ChatConsoleProps) {
         setIsGenerating(false)
       }
     },
-    [appendMessage, isGenerating, selectedRequestGroup, settings, updateMessage]
+    [
+      appendMessage,
+      isGenerating,
+      selectedRequestGroup,
+      settings,
+      t,
+      updateMessage,
+    ]
   )
 
   const handleRegenerate = useCallback(() => {
@@ -1023,9 +1059,9 @@ export function ChatConsole(props: ChatConsoleProps) {
   )
 
   return (
-    <main className='h-svh overflow-hidden bg-[#f7efe4] text-[#1b1511] selection:bg-[#f28b61]/25 selection:text-[#1b1511]'>
-      <div className='grid h-svh grid-cols-1 lg:grid-cols-[268px_minmax(0,1fr)]'>
-        <aside className='hidden h-svh flex-col border-[#ead9c1] bg-[#fffaf3] text-[#1b1511] shadow-[8px_0_40px_rgba(61,37,20,0.05)] lg:flex lg:border-r'>
+    <main className='h-dvh overflow-hidden bg-[#f7efe4] text-[#1b1511] selection:bg-[#f28b61]/25 selection:text-[#1b1511]'>
+      <div className='grid h-dvh grid-cols-1 lg:grid-cols-[268px_minmax(0,1fr)]'>
+        <aside className='hidden h-dvh flex-col border-[#ead9c1] bg-[#fffaf3] text-[#1b1511] shadow-[8px_0_40px_rgba(61,37,20,0.05)] lg:flex lg:border-r'>
           <div className='flex items-center justify-between gap-3 px-4 pt-4 pb-3'>
             <div>
               <h1 className='text-[21px] font-semibold tracking-tight text-[#1b1511]'>
@@ -1052,7 +1088,7 @@ export function ChatConsole(props: ChatConsoleProps) {
               <input
                 value={sessionSearch}
                 onChange={(event) => setSessionSearch(event.target.value)}
-                placeholder='搜索会话'
+                placeholder={t('Search sessions')}
                 className='min-w-0 flex-1 bg-transparent outline-none placeholder:text-[#9b8d7f]'
               />
             </label>
@@ -1102,7 +1138,9 @@ export function ChatConsole(props: ChatConsoleProps) {
                     <div className='flex items-center gap-2'>
                       <SessionIcon className='size-4 shrink-0 text-[#8a7665]' />
                       <span className='truncate text-sm font-medium'>
-                        {session.title}
+                        {session.title === 'New chat'
+                          ? t('New chat')
+                          : session.title}
                       </span>
                     </div>
                     <p className='mt-0.5 truncate text-xs text-[#8a7665]'>
@@ -1138,7 +1176,7 @@ export function ChatConsole(props: ChatConsoleProps) {
                 onClick={handleExportSessions}
               >
                 <FileJson className='size-4' />
-                导出
+                {t('Export')}
               </Button>
               <Button
                 variant='ghost'
@@ -1149,22 +1187,22 @@ export function ChatConsole(props: ChatConsoleProps) {
                 }}
               >
                 <Eraser className='size-4' />
-                清空图片
+                {t('Clear images')}
               </Button>
             </div>
           </div>
         </aside>
 
-        <section className='relative flex h-svh min-h-0 flex-col overflow-hidden bg-[radial-gradient(circle_at_82%_8%,rgba(242,139,97,0.13),transparent_26%),linear-gradient(180deg,#fffaf3,#f7efe4)]'>
-          <div className='relative flex h-16 items-center justify-between gap-3 border-b border-[#ead9c1] bg-[#fffaf3]/92 px-4 backdrop-blur'>
-            <div className='flex min-w-0 items-center gap-3'>
+        <section className='relative flex h-dvh min-h-0 flex-col overflow-hidden bg-[radial-gradient(circle_at_82%_8%,rgba(242,139,97,0.13),transparent_26%),linear-gradient(180deg,#fffaf3,#f7efe4)]'>
+          <div className='relative flex min-h-16 items-center justify-between gap-3 border-b border-[#ead9c1] bg-[#fffaf3]/92 px-3 py-2 backdrop-blur sm:px-4'>
+            <div className='flex min-w-0 flex-1 items-center gap-3'>
               <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                 <Button
                   size='icon'
                   variant='ghost'
                   className='size-9 rounded-xl text-[#1b1511] hover:bg-[#f6e7cc] hover:text-[#1b1511] lg:hidden'
                   onClick={() => setIsMobileMenuOpen(true)}
-                  aria-label='打开会话菜单'
+                  aria-label={t('Open session menu')}
                 >
                   <Menu className='size-5' />
                 </Button>
@@ -1190,7 +1228,7 @@ export function ChatConsole(props: ChatConsoleProps) {
                         }}
                       >
                         <Plus className='size-4' />
-                        新聊天
+                        {t('New chat')}
                       </Button>
                     </div>
                     <div className='px-3 pb-3'>
@@ -1201,7 +1239,7 @@ export function ChatConsole(props: ChatConsoleProps) {
                           onChange={(event) =>
                             setSessionSearch(event.target.value)
                           }
-                          placeholder='搜索会话'
+                          placeholder={t('Search sessions')}
                           className='min-w-0 flex-1 bg-transparent outline-none placeholder:text-[#9b8d7f]'
                         />
                       </label>
@@ -1251,7 +1289,9 @@ export function ChatConsole(props: ChatConsoleProps) {
                             <SessionIcon className='size-4 shrink-0 text-[#8a7665]' />
                             <span className='min-w-0 flex-1'>
                               <span className='block truncate text-sm font-medium'>
-                                {session.title}
+                                {session.title === 'New chat'
+                                  ? t('New chat')
+                                  : session.title}
                               </span>
                               <span className='block truncate text-xs text-[#8a7665]'>
                                 {session.model}
@@ -1268,7 +1308,7 @@ export function ChatConsole(props: ChatConsoleProps) {
                         onClick={handleExportSessions}
                       >
                         <FileJson className='size-4' />
-                        导出
+                        {t('Export')}
                       </Button>
                       <Button
                         variant='ghost'
@@ -1279,16 +1319,18 @@ export function ChatConsole(props: ChatConsoleProps) {
                         }}
                       >
                         <Eraser className='size-4' />
-                        清空图片
+                        {t('Clear images')}
                       </Button>
                     </div>
                   </div>
                 </SheetContent>
               </Sheet>
-              <div className='min-w-0'>
+              <div className='min-w-0 flex-1 sm:flex-none'>
                 <div className='flex min-w-0 items-center gap-2'>
-                  <h2 className='max-w-[34vw] truncate text-base font-semibold text-[#1b1511] lg:max-w-[420px]'>
-                    {activeSession?.title ?? t('New chat')}
+                  <h2 className='max-w-[52vw] truncate text-base font-semibold text-[#1b1511] sm:max-w-[34vw] lg:max-w-[420px]'>
+                    {activeSession?.title === 'New chat'
+                      ? t('New chat')
+                      : (activeSession?.title ?? t('New chat'))}
                   </h2>
                   <span className='rounded-full bg-[#fff3df] px-2 py-0.5 text-xs text-[#75665b] ring-1 ring-[#ead9c1]'>
                     {selectedModeLabel}
@@ -1297,6 +1339,37 @@ export function ChatConsole(props: ChatConsoleProps) {
                 <p className='hidden truncate text-xs text-[#75665b] sm:block'>
                   {t('Chat and images stay in the same conversation.')}
                 </p>
+                <select
+                  value={selectedModel}
+                  onChange={(event) =>
+                    setSettings((prev) => ({
+                      ...prev,
+                      ...(mode === 'image'
+                        ? { imageModel: event.target.value }
+                        : { model: event.target.value }),
+                    }))
+                  }
+                  disabled={
+                    mode === 'chat' && (isModelsLoading || models.length === 0)
+                  }
+                  className='mt-1 block w-full max-w-[calc(100vw-5.5rem)] rounded-lg border border-[#ead9c1] bg-[#fffdf8] px-2 py-1 text-xs text-[#75665b] outline-none focus:border-[#d36f4c] sm:hidden'
+                >
+                  {mode === 'image' ? (
+                    imageModelOptions.map((model) => (
+                      <option key={model.value} value={model.value}>
+                        {model.label}
+                      </option>
+                    ))
+                  ) : models.length === 0 ? (
+                    <option value={settings.model}>{settings.model}</option>
+                  ) : (
+                    models.map((model) => (
+                      <option key={model.value} value={model.value}>
+                        {model.label}
+                      </option>
+                    ))
+                  )}
+                </select>
               </div>
               <select
                 value={selectedModel}
@@ -1376,7 +1449,7 @@ export function ChatConsole(props: ChatConsoleProps) {
           </div>
 
           <div className='relative flex-1 overflow-y-auto'>
-            <div className='mx-auto flex min-h-full max-w-3xl flex-col gap-1 px-4 py-8'>
+            <div className='mx-auto flex min-h-full max-w-3xl flex-col gap-1 px-3 py-5 sm:px-4 sm:py-8'>
               {activeSession?.messages.length ? (
                 activeSession.messages.map((message) => (
                   <ChatBubble
@@ -1397,10 +1470,10 @@ export function ChatConsole(props: ChatConsoleProps) {
             </div>
           </div>
 
-          <div className='border-t border-[#ead9c1]/80 bg-[#fffaf3]/95 px-3 pt-3 pb-5 backdrop-blur'>
+          <div className='border-t border-[#ead9c1]/80 bg-[#fffaf3]/95 px-2 pt-2 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur sm:px-3 sm:pt-3 sm:pb-5'>
             <div className='mx-auto max-w-3xl'>
               <details className='mb-2 overflow-hidden rounded-2xl border border-[#ead9c1] bg-[#fffdf8]/90 px-3 py-2 text-sm text-[#75665b] shadow-sm transition open:border-[#d36f4c]/35'>
-                <summary className='cursor-pointer outline-none select-none'>
+                <summary className='cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap outline-none select-none'>
                   {t('Advanced settings')}
                   <span className='ml-2 text-xs text-[#8a7665]'>
                     {mode === 'image'
@@ -1409,6 +1482,29 @@ export function ChatConsole(props: ChatConsoleProps) {
                   </span>
                 </summary>
                 <div className='mt-3 grid gap-3 md:grid-cols-3'>
+                  <SimpleField label={t('Chat model')}>
+                    <select
+                      value={settings.model}
+                      onChange={(event) =>
+                        setSettings((prev) => ({
+                          ...prev,
+                          model: event.target.value,
+                        }))
+                      }
+                      disabled={isModelsLoading || models.length === 0}
+                      className='w-full rounded-lg border border-[#ead9c1] bg-[#fffaf3] px-2 py-1 text-[#1b1511] focus:border-[#d36f4c]'
+                    >
+                      {models.length === 0 ? (
+                        <option value={settings.model}>{settings.model}</option>
+                      ) : (
+                        models.map((model) => (
+                          <option key={model.value} value={model.value}>
+                            {model.label}
+                          </option>
+                        ))
+                      )}
+                    </select>
+                  </SimpleField>
                   <SimpleField label={t('Temperature')}>
                     <input
                       type='number'
@@ -1493,7 +1589,7 @@ export function ChatConsole(props: ChatConsoleProps) {
                       <span className='text-sm'>{t('Streaming')}</span>
                     </label>
                   </SimpleField>
-                  <SimpleField label='生图接口'>
+                  <SimpleField label={t('Image endpoint')}>
                     <select
                       value={settings.imageAdapter}
                       onChange={(event) =>
@@ -1507,7 +1603,7 @@ export function ChatConsole(props: ChatConsoleProps) {
                     >
                       {IMAGE_ADAPTERS.map((adapter) => (
                         <option key={adapter.value} value={adapter.value}>
-                          {adapter.label}
+                          {t(adapter.label)}
                         </option>
                       ))}
                     </select>
@@ -1566,7 +1662,7 @@ export function ChatConsole(props: ChatConsoleProps) {
                       ))}
                     </select>
                   </SimpleField>
-                  <SimpleField label='Image style'>
+                  <SimpleField label={t('Image style')}>
                     <select
                       value={settings.imageStyle}
                       onChange={(event) =>
@@ -1579,12 +1675,12 @@ export function ChatConsole(props: ChatConsoleProps) {
                     >
                       {IMAGE_STYLES.map((style) => (
                         <option key={style.value} value={style.value}>
-                          {style.label}
+                          {t(style.label)}
                         </option>
                       ))}
                     </select>
                   </SimpleField>
-                  <SimpleField label='Negative prompt'>
+                  <SimpleField label={t('Negative prompt')}>
                     <input
                       value={settings.negativePrompt}
                       onChange={(event) =>
@@ -1593,21 +1689,21 @@ export function ChatConsole(props: ChatConsoleProps) {
                           negativePrompt: event.target.value,
                         }))
                       }
-                      placeholder='不想出现在图里的内容'
+                      placeholder={t('Things to avoid in the image')}
                       className='w-full rounded-lg border border-[#ead9c1] bg-[#fffaf3] px-2 py-1 text-[#1b1511] placeholder:text-[#aa9a88] focus:border-[#d36f4c]'
                     />
                   </SimpleField>
                 </div>
               </details>
             </div>
-            <div className='mx-auto max-w-3xl rounded-[30px] border border-[#ead9c1] bg-[#fffdf8] p-2 shadow-[0_24px_80px_rgba(91,58,34,0.12)] transition focus-within:border-[#d36f4c]/55 focus-within:ring-4 focus-within:ring-[#d36f4c]/10'>
+            <div className='mx-auto max-w-3xl rounded-[22px] border border-[#ead9c1] bg-[#fffdf8] p-2 shadow-[0_24px_80px_rgba(91,58,34,0.12)] transition focus-within:border-[#d36f4c]/55 focus-within:ring-4 focus-within:ring-[#d36f4c]/10 sm:rounded-[30px]'>
               <div className='flex items-center justify-between px-2 pb-1 text-xs text-[#75665b]'>
                 <span className='truncate'>
                   {mode === 'image'
-                    ? `图片生成会进入当前对话 · ${
-                        activeImageAdapter?.hint ?? '自动选择生图接口'
-                      }`
-                    : 'ChatGPT 式对话，支持流式输出'}
+                    ? `${t('Images will be generated inside this conversation')} · ${t(
+                        activeImageAdapter?.hint ?? 'Auto select image endpoint'
+                      )}`
+                    : t('ChatGPT style chat with streaming output')}
                 </span>
                 <span className='ml-3 max-w-[45%] truncate'>
                   {selectedModel}
@@ -1622,9 +1718,11 @@ export function ChatConsole(props: ChatConsoleProps) {
                   handleSubmit()
                 }}
                 placeholder={
-                  mode === 'image' ? '描述你想生成的图片' : '输入消息'
+                  mode === 'image'
+                    ? t('Describe what you want to generate')
+                    : t('Type a message')
                 }
-                className='min-h-24 resize-none border-0 bg-transparent text-base leading-7 text-[#1b1511] shadow-none placeholder:text-[#aa9a88] focus-visible:ring-0'
+                className='min-h-20 resize-none border-0 bg-transparent text-base leading-7 text-[#1b1511] shadow-none placeholder:text-[#aa9a88] focus-visible:ring-0 sm:min-h-24'
                 disabled={isGenerating}
               />
               <div className='flex flex-wrap items-center justify-between gap-3 pt-2'>
@@ -1632,19 +1730,19 @@ export function ChatConsole(props: ChatConsoleProps) {
                   <ModeButton
                     active={mode === 'chat'}
                     icon={MessageSquare}
-                    label='聊天'
+                    label={t('Chat')}
                     onClick={() => handleModeChange('chat')}
                   />
                   <ModeButton
                     active={mode === 'image'}
                     icon={ImageIcon}
-                    label='图片'
+                    label={t('Image')}
                     onClick={() => handleModeChange('image')}
                   />
                   <ModeButton
                     active={false}
                     icon={Radio}
-                    label='工具'
+                    label={t('Tools')}
                     onClick={() => toast.info(t('Feature in development'))}
                   />
                 </div>
@@ -1655,7 +1753,7 @@ export function ChatConsole(props: ChatConsoleProps) {
                     className='rounded-full bg-[#1a1715] text-[#fff3df] shadow-sm transition hover:bg-[#2a2521] hover:text-[#fff3df]'
                   >
                     <Square className='size-4 fill-current' />
-                    停止
+                    {t('Stop')}
                   </Button>
                 ) : (
                   <Button
@@ -1664,7 +1762,7 @@ export function ChatConsole(props: ChatConsoleProps) {
                     className='rounded-full bg-[#1a1715] text-[#fff3df] shadow-sm transition hover:bg-[#2a2521] hover:text-[#fff3df] disabled:bg-[#ead9c1] disabled:text-[#9b8d7f]'
                   >
                     <Send className='size-4' />
-                    发送
+                    {t('Send')}
                   </Button>
                 )}
               </div>
@@ -1680,8 +1778,13 @@ function AccountLinks(props: {
   links: ChatAccountLink[]
   onNavigate?: () => void
 }) {
+  const { t } = useTranslation()
+
   return (
-    <nav className='grid grid-cols-2 gap-1.5' aria-label='Account navigation'>
+    <nav
+      className='grid grid-cols-2 gap-1.5'
+      aria-label={t('Account navigation')}
+    >
       {props.links.map((link) => {
         const Icon = link.icon
         return (

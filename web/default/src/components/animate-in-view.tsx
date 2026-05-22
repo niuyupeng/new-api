@@ -73,7 +73,7 @@ export function AnimateInView(props: AnimateInViewProps) {
     <Tag
       ref={ref as never}
       className={cn(
-        'opacity-0 will-change-[transform,opacity]',
+        'opacity-0 will-change-[transform,opacity] max-sm:opacity-100 max-sm:will-change-auto',
         props.className
       )}
       style={{ animationDelay: delay ? `${delay}ms` : undefined }}
