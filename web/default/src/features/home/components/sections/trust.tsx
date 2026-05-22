@@ -36,27 +36,27 @@ export function Trust() {
   const { t } = useTranslation()
 
   return (
-    <section className='bg-[#f4eadc] px-5 py-20 text-[#1b1410] md:px-8 md:py-28'>
+    <section className='bg-muted/30 text-foreground px-5 py-20 md:px-8 md:py-28'>
       <div className='mx-auto grid max-w-6xl gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-stretch'>
-        <AnimateInView className='rounded-lg border border-[#251813] bg-[#15110f] p-6 text-[#fff4df] shadow-[0_24px_70px_rgba(48,30,19,0.18)] md:p-8'>
-          <p className='mb-4 text-xs font-black tracking-[0.18em] text-[#f28b61] uppercase'>
+        <AnimateInView className='border-border bg-card text-card-foreground rounded-lg border p-6 shadow-[0_24px_70px_rgba(48,30,19,0.18)] md:p-8'>
+          <p className='mb-4 text-xs font-black tracking-[0.18em] text-orange-400 uppercase'>
             {t('ACCESS PROMISE')}
           </p>
           <h2 className='max-w-lg text-3xl leading-tight font-black md:text-5xl'>
             {t('别让用户为接入方式发愁。')}
           </h2>
-          <p className='mt-5 text-sm leading-7 text-[#d8c9b6]'>
+          <p className='text-muted-foreground mt-5 text-sm leading-7'>
             {t(
               'ccapi 的公共页面会把“我该点哪里、复制什么、填到哪里、怎么充值”讲得直接一点，适合新手，也适合每天切工具的开发者。'
             )}
           </p>
 
-          <div className='mt-8 rounded-lg border border-white/10 bg-white/[0.04] p-4'>
+          <div className='border-border bg-muted/40 mt-8 rounded-lg border p-4'>
             <div className='mb-4 flex items-center justify-between gap-3'>
-              <span className='text-xs font-black tracking-[0.16em] text-[#f28b61] uppercase'>
+              <span className='text-xs font-black tracking-[0.16em] text-orange-400 uppercase'>
                 {t('USER FLOW')}
               </span>
-              <span className='rounded-full bg-[#f28b61] px-3 py-1 text-xs font-black text-[#21120e]'>
+              <span className='rounded-full bg-orange-400 px-3 py-1 text-xs font-black text-black'>
                 {t('4 STEPS')}
               </span>
             </div>
@@ -64,9 +64,9 @@ export function Trust() {
               {checklist.map((item, index) => (
                 <div
                   key={item}
-                  className='flex items-start gap-3 rounded-md bg-[#090807] px-4 py-3 text-sm text-[#eadbc8]'
+                  className='bg-background text-foreground flex items-start gap-3 rounded-md px-4 py-3 text-sm'
                 >
-                  <span className='mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-[#f28b61] text-xs font-black text-[#21120e]'>
+                  <span className='mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-orange-400 text-xs font-black text-black'>
                     {index + 1}
                   </span>
                   <span>{t(item)}</span>
@@ -84,13 +84,13 @@ export function Trust() {
                 key={item.title}
                 delay={index * 90}
                 animation='fade-up'
-                className='rounded-lg border border-[#dac8ae] bg-[#fffaf2] p-6 shadow-[0_14px_36px_rgba(93,55,29,0.07)]'
+                className='border-border bg-card rounded-lg border p-6 shadow-[0_14px_36px_rgba(93,55,29,0.07)]'
               >
-                <div className='mb-5 flex size-11 items-center justify-center rounded-lg bg-[#1a1715] text-[#f28b61]'>
+                <div className='mb-5 flex size-11 items-center justify-center rounded-lg bg-orange-400/10 text-orange-400'>
                   <Icon className='size-5' />
                 </div>
                 <h3 className='text-xl font-black'>{t(item.title)}</h3>
-                <p className='mt-3 text-sm leading-7 text-[#746255]'>
+                <p className='text-muted-foreground mt-3 text-sm leading-7'>
                   {t(item.desc)}
                 </p>
               </AnimateInView>

@@ -23,17 +23,19 @@ export function Stats() {
   ]
 
   return (
-    <section className='border-y border-[#2b241d] bg-[#151312] px-5 py-8 text-[#fff3df] md:px-8'>
+    <section className='border-border bg-background text-foreground border-y px-5 py-8 md:px-8'>
       <div className='mx-auto grid max-w-6xl grid-cols-2 gap-3 md:grid-cols-4'>
         {stats.map((item) => (
           <div
             key={item.label}
-            className='rounded-lg border border-white/10 bg-white/[0.035] px-4 py-5'
+            className='border-border bg-card rounded-lg border px-4 py-5'
           >
-            <div className='text-2xl font-black text-[#f28b61]'>
+            <div className='text-2xl font-black text-orange-400'>
               {item.value}
             </div>
-            <div className='mt-1 text-xs text-[#b9aa99]'>{item.label}</div>
+            <div className='text-muted-foreground mt-1 text-xs'>
+              {item.label}
+            </div>
           </div>
         ))}
       </div>

@@ -42,16 +42,16 @@ export function HowItWorks() {
   ]
 
   return (
-    <section className='bg-[#11100f] px-5 py-20 text-[#fff3df] md:px-8 md:py-28'>
+    <section className='bg-background text-foreground px-5 py-20 md:px-8 md:py-28'>
       <div className='mx-auto max-w-6xl'>
         <AnimateInView className='mb-12 text-center'>
-          <p className='mb-3 text-xs font-black tracking-[0.18em] text-[#f28b61] uppercase'>
+          <p className='mb-3 text-xs font-black tracking-[0.18em] text-orange-400 uppercase'>
             {t('CONNECT GUIDE')}
           </p>
           <h2 className='text-3xl leading-tight font-black md:text-5xl'>
             {t('常用工具，直接按模板接。')}
           </h2>
-          <p className='mx-auto mt-4 max-w-2xl text-sm leading-7 text-[#c8bbaa]'>
+          <p className='text-muted-foreground mx-auto mt-4 max-w-2xl text-sm leading-7'>
             {t(
               '用户不需要理解一堆协议差异，只要选择自己的工具，复制对应配置即可开始调用。'
             )}
@@ -65,17 +65,17 @@ export function HowItWorks() {
               delay={index * 90}
               animation='fade-up'
             >
-              <div className='rounded-lg border border-white/10 bg-white/[0.045] p-5'>
+              <div className='border-border bg-card rounded-lg border p-5'>
                 <div className='mb-4 flex items-center justify-between gap-3'>
                   <h3 className='text-xl font-black'>{tool.name}</h3>
-                  <span className='rounded-full bg-[#f28b61]/15 px-3 py-1 text-xs font-bold text-[#f28b61]'>
+                  <span className='rounded-full bg-orange-400/15 px-3 py-1 text-xs font-bold text-orange-400'>
                     {t('可复制')}
                   </span>
                 </div>
-                <div className='space-y-2 rounded-lg bg-[#090807] p-4 font-mono text-xs leading-6 text-[#e9dcc9]'>
+                <div className='bg-muted text-foreground space-y-2 rounded-lg p-4 font-mono text-xs leading-6'>
                   {tool.lines.map((line) => (
                     <div key={line} className='flex gap-2'>
-                      <span className='text-[#f28b61]'>$</span>
+                      <span className='text-orange-400'>$</span>
                       <span className='break-all'>{line}</span>
                     </div>
                   ))}
@@ -85,20 +85,20 @@ export function HowItWorks() {
           ))}
         </div>
 
-        <AnimateInView className='mt-10 rounded-lg border border-[#f28b61]/25 bg-[#27160f] p-6 md:flex md:items-center md:justify-between'>
+        <AnimateInView className='border-border bg-card mt-10 rounded-lg border p-6 md:flex md:items-center md:justify-between'>
           <div>
             <h3 className='text-xl font-black'>{t('从零开始也能走完')}</h3>
-            <div className='mt-4 grid gap-3 text-sm text-[#d8c8b5] sm:grid-cols-3'>
+            <div className='text-muted-foreground mt-4 grid gap-3 text-sm sm:grid-cols-3'>
               {[t('注册账号'), t('充值或兑换'), t('复制配置')].map((item) => (
                 <div key={item} className='flex items-center gap-2'>
-                  <CheckCircle2 className='size-4 text-[#f28b61]' />
+                  <CheckCircle2 className='size-4 text-orange-400' />
                   {item}
                 </div>
               ))}
             </div>
           </div>
           <Button
-            className='mt-6 h-11 rounded-lg bg-[#f28b61] px-6 font-bold text-[#22110d] hover:bg-[#ff9d73] md:mt-0'
+            className='mt-6 h-11 rounded-lg bg-orange-400 px-6 font-bold text-black hover:bg-orange-300 md:mt-0'
             asChild
           >
             <a href='/docs/'>

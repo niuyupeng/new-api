@@ -69,12 +69,12 @@ For commercial licensing, please contact support@quantumnous.com
 }
 
 .ccapi-public-header {
-  color: #fff3df;
+  color: var(--foreground);
 }
 
 .ccapi-public-header nav {
-  background: rgba(17, 16, 15, 0.72);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  background: color-mix(in oklch, var(--background) 82%, transparent);
+  border-bottom: 1px solid var(--border);
   backdrop-filter: blur(18px);
 }
 
@@ -85,12 +85,12 @@ For commercial licensing, please contact support@quantumnous.com
 
 .ccapi-auth-shell input,
 .ccapi-auth-shell button[role='combobox'] {
-  border-color: #ead9c1;
-  background: #fffdf8;
+  border-color: var(--border);
+  background: var(--card);
 }
 
 .ccapi-auth-shell input:focus-visible {
-  border-color: #d36f4c;
+  border-color: rgb(251 146 60);
   box-shadow: 0 0 0 3px rgba(211, 111, 76, 0.18);
 }
 
@@ -98,122 +98,14 @@ For commercial licensing, please contact support@quantumnous.com
 .ccapi-auth-shell form > button:not([type]) {
   min-height: 2.75rem;
   border-radius: 0.5rem;
-  background: #1a1715;
-  color: #fff3df;
+  background: var(--foreground);
+  color: var(--background);
   font-weight: 800;
 }
 
 .ccapi-auth-shell form > button[type='submit']:hover,
 .ccapi-auth-shell form > button:not([type]):hover {
-  background: #2a2521;
-}
-
-body:has(.ccapi-wallet-page) {
-  --background: #fff8ee;
-  --foreground: #231915;
-  --card: #fffdf8;
-  --card-foreground: #231915;
-  --popover: #fffdf8;
-  --popover-foreground: #231915;
-  --primary: #1f1713;
-  --primary-foreground: #fff4df;
-  --secondary: #f4e7d5;
-  --secondary-foreground: #2a201a;
-  --muted: #f4e9da;
-  --muted-foreground: #75675d;
-  --accent: #f2dfc5;
-  --accent-foreground: #2a201a;
-  --border: #ead9c1;
-  --input: #ead9c1;
-  --ring: #d9704d;
-  --sidebar: #fff4e6;
-  --sidebar-foreground: #2a201a;
-  --sidebar-primary: #1f1713;
-  --sidebar-primary-foreground: #fff4df;
-  --sidebar-accent: #f4e5d1;
-  --sidebar-accent-foreground: #231915;
-  --sidebar-border: #ead8c1;
-  --sidebar-ring: #d9704d;
-}
-
-body:has(.ccapi-wallet-page) [data-slot='sidebar-wrapper'] {
-  background:
-    radial-gradient(circle at 18% 10%, rgba(238, 120, 79, 0.12), transparent 30%),
-    #fff8ee;
-}
-
-body:has(.ccapi-wallet-page) [data-slot='sidebar-inner'] {
-  border-right: 1px solid rgba(176, 130, 87, 0.24);
-  background: rgba(255, 247, 235, 0.94);
-}
-
-body:has(.ccapi-wallet-page) [data-slot='sidebar-inset'] {
-  background:
-    linear-gradient(180deg, rgba(255, 249, 239, 0.96), rgba(255, 244, 230, 0.92)),
-    radial-gradient(circle at 78% 0%, rgba(238, 120, 79, 0.16), transparent 34%);
-}
-
-body:has(.ccapi-wallet-page) [data-slot='card'] {
-  border-color: rgba(176, 130, 87, 0.2);
-  background: rgba(255, 253, 248, 0.92);
-  box-shadow: 0 20px 60px -42px rgba(92, 56, 28, 0.55);
-}
-
-body:has(.ccapi-wallet-page) [data-slot='button'] {
-  border-color: rgba(176, 130, 87, 0.28);
-}
-
-body:has(.ccapi-wallet-page) input {
-  background: rgba(255, 253, 248, 0.9);
-}
-
-body:has(.ccapi-wallet-page) input:disabled {
-  background: rgba(244, 232, 215, 0.72);
-  color: rgba(117, 103, 93, 0.72);
-}
-
-body:has(.ccapi-pricing-page) {
-  --background: #fff8ee;
-  --foreground: #211712;
-  --card: #fffdf8;
-  --card-foreground: #211712;
-  --popover: #fffdf8;
-  --popover-foreground: #211712;
-  --primary: #211712;
-  --primary-foreground: #fff7eb;
-  --secondary: #f5ebdd;
-  --secondary-foreground: #211712;
-  --muted: #f5ebdd;
-  --muted-foreground: #6f6257;
-  --accent: #f0dfc8;
-  --accent-foreground: #211712;
-  --border: #ead9c1;
-  --input: #ead9c1;
-  --ring: #c95f3f;
-}
-
-.ccapi-pricing-page main > div,
-.ccapi-pricing-page aside,
-.ccapi-pricing-page [class*='rounded-xl'][class*='border'] {
-  border-color: #ead9c1;
-  background-color: rgba(255, 253, 248, 0.92);
-}
-
-.ccapi-pricing-page table,
-.ccapi-pricing-page thead,
-.ccapi-pricing-page tbody,
-.ccapi-pricing-page [role='table'] {
-  color: #211712;
-}
-
-.ccapi-pricing-page input {
-  border-color: #d9c5aa;
-  background: #fffdf8;
-  color: #211712;
-}
-
-.ccapi-pricing-page input::placeholder {
-  color: #8a7a6b;
+  opacity: 0.9;
 }
 
 .ccapi-docs-page,

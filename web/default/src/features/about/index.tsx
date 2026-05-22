@@ -43,43 +43,43 @@ function EmptyAboutState() {
   const currentYear = new Date().getFullYear()
 
   return (
-    <div className='flex min-h-svh items-center justify-center bg-[#11100f] p-8 pt-28 text-[#fff3df]'>
+    <div className='bg-background text-foreground flex min-h-svh items-center justify-center p-8 pt-28'>
       <div className='grid max-w-6xl gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center'>
         <div>
-          <p className='mb-4 inline-flex rounded-full border border-[#f28b61]/35 bg-[#2a1712]/80 px-3 py-1.5 text-xs font-black tracking-[0.16em] text-[#f28b61] uppercase'>
+          <p className='mb-4 inline-flex rounded-full border border-orange-400/35 bg-orange-400/10 px-3 py-1.5 text-xs font-black tracking-[0.16em] text-orange-400 uppercase'>
             {t('ABOUT CCAPI')}
           </p>
           <h2 className='text-5xl leading-[0.98] font-black md:text-7xl'>
             {t('一个给开发者的')}
             <br />
-            <span className='text-[#f28b61]'>{t('模型接入柜台')}</span>
+            <span className='text-orange-400'>{t('模型接入柜台')}</span>
           </h2>
-          <p className='mt-6 max-w-xl text-sm leading-7 text-[#c8bbaa]'>
+          <p className='text-muted-foreground mt-6 max-w-xl text-sm leading-7'>
             {t(
               '管理员还没有配置自定义关于页。当前站点可作为 AI API 中转、密钥管理、余额计费和模型路由入口使用。'
             )}
           </p>
         </div>
-        <div className='rounded-lg border border-white/10 bg-white/[0.045] p-6 shadow-[0_30px_90px_rgba(0,0,0,0.35)]'>
+        <div className='border-border bg-card rounded-lg border p-6 shadow-[0_30px_90px_rgba(0,0,0,0.24)]'>
           <div className='mb-6 flex items-center gap-3'>
-            <div className='flex size-12 items-center justify-center rounded-lg bg-[#2a1712] text-[#f28b61]'>
+            <div className='flex size-12 items-center justify-center rounded-lg bg-orange-400/10 text-orange-400'>
               <Construction className='h-6 w-6' />
             </div>
             <div>
               <h3 className='text-xl font-black'>{t('站点说明待配置')}</h3>
-              <p className='text-sm text-[#a99886]'>
+              <p className='text-muted-foreground text-sm'>
                 ccapi.chat / {t('OpenAI Compatible')}
               </p>
             </div>
           </div>
-          <div className='space-y-4 rounded-lg bg-[#090807] p-5 text-sm leading-7 text-[#d8c8b5]'>
+          <div className='bg-muted text-muted-foreground space-y-4 rounded-lg p-5 text-sm leading-7'>
             <p>
               {t('New API Project Repository:')}{' '}
               <a
                 href='https://github.com/QuantumNous/new-api'
                 target='_blank'
                 rel='noopener noreferrer'
-                className='font-bold text-[#f28b61] hover:underline'
+                className='font-bold text-orange-400 hover:underline'
               >
                 {t('https://github.com/QuantumNous/new-api')}
               </a>
@@ -89,7 +89,7 @@ function EmptyAboutState() {
                 href='https://github.com/QuantumNous/new-api'
                 target='_blank'
                 rel='noopener noreferrer'
-                className='font-bold text-[#f28b61] hover:underline'
+                className='font-bold text-orange-400 hover:underline'
               >
                 {t('NewAPI')}
               </a>{' '}
@@ -98,7 +98,7 @@ function EmptyAboutState() {
                 href='https://github.com/QuantumNous'
                 target='_blank'
                 rel='noopener noreferrer'
-                className='font-bold text-[#f28b61] hover:underline'
+                className='font-bold text-orange-400 hover:underline'
               >
                 {t('QuantumNous')}
               </a>{' '}
@@ -107,7 +107,7 @@ function EmptyAboutState() {
                 href='https://github.com/songquanpeng/one-api'
                 target='_blank'
                 rel='noopener noreferrer'
-                className='font-bold text-[#f28b61] hover:underline'
+                className='font-bold text-orange-400 hover:underline'
               >
                 {t('One API')}
               </a>
@@ -118,7 +118,7 @@ function EmptyAboutState() {
                 href='https://github.com/QuantumNous/new-api/blob/main/LICENSE'
                 target='_blank'
                 rel='noopener noreferrer'
-                className='font-bold text-[#f28b61] hover:underline'
+                className='font-bold text-orange-400 hover:underline'
               >
                 {t('AGPL v3.0 License')}
               </a>

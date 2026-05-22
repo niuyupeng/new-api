@@ -1,5 +1,5 @@
-import { Link } from '@tanstack/react-router'
 import type { ComponentType } from 'react'
+import { Link } from '@tanstack/react-router'
 import {
   AlertTriangle,
   Bot,
@@ -45,11 +45,13 @@ type ToolGuide = {
 const quickSteps: GuideStep[] = [
   {
     title: '充值或兑换额度',
-    detail: '先登录账号，进入钱包页面充值或兑换额度。没有余额时，请求不会正常消耗。',
+    detail:
+      '先登录账号，进入钱包页面充值或兑换额度。没有余额时，请求不会正常消耗。',
   },
   {
     title: '生成 API Key',
-    detail: '进入控制台的 API 密钥页面，新建一个 Key。示例里统一写 sk-your-api-key。',
+    detail:
+      '进入控制台的 API 密钥页面，新建一个 Key。示例里统一写 sk-your-api-key。',
   },
   {
     title: '复制 Base URL',
@@ -183,7 +185,10 @@ const commonErrors = [
   ['500', '上游或渠道异常。保留 request id 方便排查。'],
   ['model not found', '模型名写错，或当前账号不可用。以模型价格页显示为准。'],
   ['no available channel', '后台没有给当前模型/分组配置可用渠道。'],
-  ['image endpoint unsupported', '该模型不支持当前生图接口，换 Images API 或 Chat 生图方式。'],
+  [
+    'image endpoint unsupported',
+    '该模型不支持当前生图接口，换 Images API 或 Chat 生图方式。',
+  ],
 ]
 
 function copy(text: string) {
@@ -193,25 +198,27 @@ function copy(text: string) {
 
 function CodeBlock(props: CodeExample) {
   return (
-    <article className='min-w-0 overflow-hidden rounded-lg border border-[#ead9c1] bg-white p-3 shadow-sm sm:p-4'>
+    <article className='border-border bg-card min-w-0 overflow-hidden rounded-lg border p-3 shadow-sm sm:p-4'>
       <div className='mb-3 flex flex-col items-start justify-between gap-3 sm:flex-row'>
         <div className='min-w-0'>
-          <h3 className='font-bold text-[#211712]'>{props.title}</h3>
-          <p className='mt-1 text-sm leading-6 text-[#6f6257]'>{props.desc}</p>
+          <h3 className='text-foreground font-bold'>{props.title}</h3>
+          <p className='text-muted-foreground mt-1 text-sm leading-6'>
+            {props.desc}
+          </p>
         </div>
         <Button
           type='button'
           size='sm'
           variant='outline'
-          className='shrink-0 border-[#d9c5aa] bg-[#fffdf8]'
+          className='border-border bg-card shrink-0'
           onClick={() => copy(props.code)}
         >
           <Copy className='size-4' />
           复制
         </Button>
       </div>
-      <pre className='max-w-full overflow-x-auto rounded-md bg-[#171412] p-3 text-xs leading-6 text-[#fff7eb] sm:p-4'>
-        <code className='block min-w-full w-max'>{props.code}</code>
+      <pre className='max-w-full overflow-x-auto rounded-md bg-zinc-950 p-3 text-xs leading-6 text-zinc-100 sm:p-4'>
+        <code className='block w-max min-w-full'>{props.code}</code>
       </pre>
     </article>
   )
@@ -226,15 +233,15 @@ function SectionTitle(props: {
   const Icon = props.icon
   return (
     <div className='mb-5'>
-      <div className='mb-2 flex items-center gap-2 text-sm font-bold text-[#c95f3f]'>
+      <div className='mb-2 flex items-center gap-2 text-sm font-bold text-orange-400'>
         <Icon className='size-4' />
         {props.eyebrow}
       </div>
-      <h2 className='text-2xl font-black tracking-tight text-[#211712] md:text-3xl'>
+      <h2 className='text-foreground text-2xl font-black tracking-tight md:text-3xl'>
         {props.title}
       </h2>
       {props.desc && (
-        <p className='mt-2 max-w-3xl text-sm leading-7 text-[#6f6257]'>
+        <p className='text-muted-foreground mt-2 max-w-3xl text-sm leading-7'>
           {props.desc}
         </p>
       )}
@@ -250,35 +257,33 @@ export function ApiDocs() {
       siteName='ccapi'
       headerProps={{ className: 'ccapi-public-header' }}
     >
-      <main className='ccapi-docs-page min-h-svh overflow-x-clip bg-[#fff8ee] pt-24 text-[#211712]'>
-        <section className='border-b border-[#ead9c1] px-4 py-10 sm:px-5 md:px-8'>
+      <main className='ccapi-docs-page bg-background text-foreground min-h-svh overflow-x-clip pt-24'>
+        <section className='border-border border-b px-4 py-10 sm:px-5 md:px-8'>
           <div className='mx-auto max-w-6xl'>
             <div className='max-w-3xl'>
-              <p className='mb-3 text-sm font-bold text-[#c95f3f]'>
-                接入文档
-              </p>
+              <p className='mb-3 text-sm font-bold text-orange-400'>接入文档</p>
               <h1 className='text-3xl font-black tracking-tight sm:text-4xl md:text-5xl'>
                 按步骤填，不绕弯。
               </h1>
-              <p className='mt-4 text-base leading-8 text-[#6f6257]'>
-                这里不讲概念，直接告诉你：先充值，生成 Key，复制正确的
-                Base URL，然后用模型价格页里的模型名发请求。
+              <p className='text-muted-foreground mt-4 text-base leading-8'>
+                这里不讲概念，直接告诉你：先充值，生成 Key，复制正确的 Base
+                URL，然后用模型价格页里的模型名发请求。
               </p>
             </div>
 
             <div className='mt-8 grid min-w-0 gap-3 md:grid-cols-2'>
-              <div className='min-w-0 rounded-lg border border-[#ead9c1] bg-white p-4'>
+              <div className='border-border bg-card min-w-0 rounded-lg border p-4'>
                 <div className='mb-2 flex items-center gap-2 font-bold'>
-                  <Terminal className='size-4 text-[#c95f3f]' />
+                  <Terminal className='size-4 text-orange-400' />
                   OpenAI 兼容地址
                 </div>
-                <div className='rounded-md bg-[#171412] p-3 font-mono text-sm break-all text-[#fff7eb]'>
+                <div className='rounded-md bg-zinc-950 p-3 font-mono text-sm break-all text-zinc-100'>
                   {openAiBaseUrl}
                 </div>
                 <Button
                   type='button'
                   size='sm'
-                  className='mt-3 bg-[#211712] text-[#fff7eb] hover:bg-[#33251c]'
+                  className='bg-foreground text-background hover:bg-foreground/90 mt-3'
                   onClick={() => copy(openAiBaseUrl)}
                 >
                   <Copy className='size-4' />
@@ -286,19 +291,19 @@ export function ApiDocs() {
                 </Button>
               </div>
 
-              <div className='min-w-0 rounded-lg border border-[#ead9c1] bg-white p-4'>
+              <div className='border-border bg-card min-w-0 rounded-lg border p-4'>
                 <div className='mb-2 flex items-center gap-2 font-bold'>
-                  <Bot className='size-4 text-[#c95f3f]' />
+                  <Bot className='size-4 text-orange-400' />
                   Claude / Anthropic 地址
                 </div>
-                <div className='rounded-md bg-[#171412] p-3 font-mono text-sm break-all text-[#fff7eb]'>
+                <div className='rounded-md bg-zinc-950 p-3 font-mono text-sm break-all text-zinc-100'>
                   {claudeBaseUrl}
                 </div>
                 <Button
                   type='button'
                   size='sm'
                   variant='outline'
-                  className='mt-3 border-[#d9c5aa] bg-[#fffdf8]'
+                  className='border-border bg-card mt-3'
                   onClick={() => copy(claudeBaseUrl)}
                 >
                   <Copy className='size-4' />
@@ -321,32 +326,32 @@ export function ApiDocs() {
               {quickSteps.map((step, index) => (
                 <article
                   key={step.title}
-                  className='rounded-lg border border-[#ead9c1] bg-white p-4 shadow-sm'
+                  className='border-border bg-card rounded-lg border p-4 shadow-sm'
                 >
-                  <div className='mb-3 flex size-8 items-center justify-center rounded-full bg-[#211712] text-sm font-black text-[#fff7eb]'>
+                  <div className='bg-foreground text-background mb-3 flex size-8 items-center justify-center rounded-full text-sm font-black'>
                     {index + 1}
                   </div>
                   <h3 className='font-bold'>{step.title}</h3>
-                  <p className='mt-2 text-sm leading-6 text-[#6f6257]'>
+                  <p className='text-muted-foreground mt-2 text-sm leading-6'>
                     {step.detail}
                   </p>
                 </article>
               ))}
             </div>
             <div className='mt-5 flex flex-wrap gap-3'>
-              <Button asChild className='bg-[#211712] text-[#fff7eb]'>
+              <Button asChild className='bg-foreground text-background'>
                 <Link to='/wallet'>
                   <WalletCards className='size-4' />
                   去充值
                 </Link>
               </Button>
-              <Button asChild variant='outline' className='border-[#d9c5aa]'>
+              <Button asChild variant='outline' className='border-border'>
                 <Link to='/keys'>
                   <KeyRound className='size-4' />
                   生成 API Key
                 </Link>
               </Button>
-              <Button asChild variant='outline' className='border-[#d9c5aa]'>
+              <Button asChild variant='outline' className='border-border'>
                 <Link to='/pricing'>
                   <MessageSquareText className='size-4' />
                   查看模型价格
@@ -356,7 +361,7 @@ export function ApiDocs() {
           </div>
         </section>
 
-        <section className='border-y border-[#ead9c1] bg-[#fffdf8] px-4 py-10 sm:px-5 md:px-8'>
+        <section className='border-border bg-card border-y px-4 py-10 sm:px-5 md:px-8'>
           <div className='mx-auto max-w-6xl'>
             <SectionTitle
               icon={Wrench}
@@ -364,8 +369,8 @@ export function ApiDocs() {
               title='不同工具只差 Base URL'
               desc='最容易填错的是 Claude Code：它填根域名。OpenAI 兼容工具才填 /v1。'
             />
-            <div className='min-w-0 overflow-hidden rounded-lg border border-[#ead9c1] bg-white'>
-              <div className='grid grid-cols-[1.1fr_1fr_0.85fr_1.2fr] border-b border-[#ead9c1] bg-[#f5ebdd] px-4 py-3 text-sm font-bold text-[#4c4037] max-lg:hidden'>
+            <div className='border-border bg-card min-w-0 overflow-hidden rounded-lg border'>
+              <div className='border-border bg-muted text-foreground grid grid-cols-[1.1fr_1fr_0.85fr_1.2fr] border-b px-4 py-3 text-sm font-bold max-lg:hidden'>
                 <div>工具</div>
                 <div>地址</div>
                 <div>Key 字段</div>
@@ -374,23 +379,23 @@ export function ApiDocs() {
               {toolGuides.map((tool) => (
                 <div
                   key={tool.name}
-                  className='grid min-w-0 gap-2 border-b border-[#ead9c1] px-4 py-4 text-sm last:border-b-0 lg:grid-cols-[1.1fr_1fr_0.85fr_1.2fr] lg:items-center'
+                  className='border-border grid min-w-0 gap-2 border-b px-4 py-4 text-sm last:border-b-0 lg:grid-cols-[1.1fr_1fr_0.85fr_1.2fr] lg:items-center'
                 >
                   <div className='font-bold'>{tool.name}</div>
                   <div>
-                    <div className='mb-1 text-xs font-bold text-[#8a7a6b] lg:hidden'>
+                    <div className='text-muted-foreground mb-1 text-xs font-bold lg:hidden'>
                       {tool.urlLabel}
                     </div>
-                    <code className='rounded bg-[#f5ebdd] px-2 py-1 font-mono text-xs break-all'>
+                    <code className='bg-muted rounded px-2 py-1 font-mono text-xs break-all'>
                       {tool.url}
                     </code>
                   </div>
                   <div>
-                    <code className='rounded bg-[#f5ebdd] px-2 py-1 font-mono text-xs'>
+                    <code className='bg-muted rounded px-2 py-1 font-mono text-xs'>
                       {tool.keyName}
                     </code>
                   </div>
-                  <p className='leading-6 text-[#6f6257]'>{tool.note}</p>
+                  <p className='text-muted-foreground leading-6'>{tool.note}</p>
                 </div>
               ))}
             </div>
@@ -413,7 +418,7 @@ export function ApiDocs() {
           </div>
         </section>
 
-        <section className='border-y border-[#ead9c1] bg-[#fffdf8] px-4 py-10 sm:px-5 md:px-8'>
+        <section className='border-border bg-card border-y px-4 py-10 sm:px-5 md:px-8'>
           <div className='mx-auto max-w-6xl'>
             <SectionTitle
               icon={ImageIcon}
@@ -445,7 +450,7 @@ export function ApiDocs() {
           </div>
         </section>
 
-        <section className='border-t border-[#ead9c1] bg-[#fffdf8] px-4 py-10 sm:px-5 md:px-8'>
+        <section className='border-border bg-card border-t px-4 py-10 sm:px-5 md:px-8'>
           <div className='mx-auto max-w-6xl'>
             <SectionTitle
               icon={AlertTriangle}
@@ -457,12 +462,12 @@ export function ApiDocs() {
               {commonErrors.map(([code, desc]) => (
                 <div
                   key={code}
-                  className='rounded-lg border border-[#ead9c1] bg-white p-4'
+                  className='border-border bg-card rounded-lg border p-4'
                 >
-                  <div className='font-mono text-sm font-black text-[#c95f3f]'>
+                  <div className='font-mono text-sm font-black text-orange-400'>
                     {code}
                   </div>
-                  <p className='mt-2 text-sm leading-6 text-[#6f6257]'>
+                  <p className='text-muted-foreground mt-2 text-sm leading-6'>
                     {desc}
                   </p>
                 </div>
@@ -472,7 +477,7 @@ export function ApiDocs() {
               href='https://platform.openai.com/docs/api-reference'
               target='_blank'
               rel='noreferrer'
-              className='mt-6 inline-flex items-center gap-2 text-sm font-bold text-[#c95f3f]'
+              className='mt-6 inline-flex items-center gap-2 text-sm font-bold text-orange-400'
             >
               OpenAI API 官方参考
               <ExternalLink className='size-4' />

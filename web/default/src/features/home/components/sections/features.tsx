@@ -49,18 +49,18 @@ export function Features() {
   ]
 
   return (
-    <section className='bg-[#fff8ed] px-5 py-20 text-[#211712] md:px-8 md:py-28'>
+    <section className='bg-muted/30 text-foreground px-5 py-20 md:px-8 md:py-28'>
       <div className='mx-auto max-w-6xl'>
         <AnimateInView className='mb-10 flex flex-col justify-between gap-5 md:mb-14 md:flex-row md:items-end'>
           <div>
-            <p className='mb-3 text-xs font-black tracking-[0.18em] text-[#d36f4c] uppercase'>
+            <p className='mb-3 text-xs font-black tracking-[0.18em] text-orange-400 uppercase'>
               {t('WHY CCAPI')}
             </p>
             <h2 className='max-w-2xl text-3xl leading-tight font-black md:text-5xl'>
               {t('不是再给用户一堆参数，而是给一条能跑通的路。')}
             </h2>
           </div>
-          <p className='max-w-sm text-sm leading-7 text-[#7a6a5e]'>
+          <p className='text-muted-foreground max-w-sm text-sm leading-7'>
             {t(
               '页面会把“注册、充值、复制配置、粘贴到工具、开始调用”讲成一条完整路径，减少用户来回问。'
             )}
@@ -89,12 +89,14 @@ export function Features() {
 
 function FeatureCard(props: { icon: ReactNode; title: string; desc: string }) {
   return (
-    <div className='h-full rounded-lg border border-[#ead9c1] bg-white p-6 shadow-[0_12px_30px_rgba(93,55,29,0.06)]'>
-      <div className='mb-5 flex size-10 items-center justify-center rounded-lg bg-[#1a1715] text-[#f28b61]'>
+    <div className='border-border bg-card h-full rounded-lg border p-6 shadow-[0_12px_30px_rgba(93,55,29,0.06)]'>
+      <div className='mb-5 flex size-10 items-center justify-center rounded-lg bg-orange-400/10 text-orange-400'>
         {props.icon}
       </div>
       <h3 className='text-lg font-black'>{props.title}</h3>
-      <p className='mt-3 text-sm leading-7 text-[#75665b]'>{props.desc}</p>
+      <p className='text-muted-foreground mt-3 text-sm leading-7'>
+        {props.desc}
+      </p>
     </div>
   )
 }

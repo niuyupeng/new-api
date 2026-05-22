@@ -1072,22 +1072,22 @@ export function ChatConsole(props: ChatConsoleProps) {
   )
 
   return (
-    <main className='h-dvh overflow-hidden bg-[#f7efe4] text-[#1b1511] selection:bg-[#f28b61]/25 selection:text-[#1b1511]'>
+    <main className='bg-background text-foreground selection:text-foreground h-dvh overflow-hidden selection:bg-orange-400/25'>
       <div className='grid h-dvh grid-cols-1 lg:grid-cols-[268px_minmax(0,1fr)]'>
-        <aside className='hidden h-dvh flex-col border-[#ead9c1] bg-[#fffaf3] text-[#1b1511] shadow-[8px_0_40px_rgba(61,37,20,0.05)] lg:flex lg:border-r'>
+        <aside className='border-border bg-card text-foreground hidden h-dvh flex-col shadow-[8px_0_40px_rgba(61,37,20,0.05)] lg:flex lg:border-r'>
           <div className='flex items-center justify-between gap-3 px-4 pt-4 pb-3'>
             <div>
-              <h1 className='text-[21px] font-semibold tracking-tight text-[#1b1511]'>
+              <h1 className='text-foreground text-[21px] font-semibold tracking-tight'>
                 ccapi
               </h1>
-              <p className='text-xs font-medium text-[#75665b]'>
+              <p className='text-muted-foreground text-xs font-medium'>
                 {t('Chat and images')}
               </p>
             </div>
             <Button
               size='icon'
               variant='ghost'
-              className='size-9 rounded-xl text-[#1b1511] transition hover:bg-[#f6e7cc] hover:text-[#1b1511]'
+              className='text-foreground hover:bg-accent hover:text-foreground size-9 rounded-xl transition'
               onClick={() => handleNewSession(mode)}
               aria-label={t('New chat')}
             >
@@ -1096,13 +1096,13 @@ export function ChatConsole(props: ChatConsoleProps) {
           </div>
 
           <div className='px-4 pb-3'>
-            <label className='flex items-center gap-2 rounded-2xl border border-[#ead9c1] bg-[#fffdf8] px-3 py-2.5 text-sm text-[#1b1511] shadow-sm transition focus-within:border-[#d36f4c] focus-within:ring-3 focus-within:ring-[#d36f4c]/15'>
-              <Search className='size-4 text-[#8a7665]' />
+            <label className='border-border bg-card text-foreground flex items-center gap-2 rounded-2xl border px-3 py-2.5 text-sm shadow-sm transition focus-within:border-orange-400 focus-within:ring-3 focus-within:ring-orange-400/15'>
+              <Search className='text-muted-foreground size-4' />
               <input
                 value={sessionSearch}
                 onChange={(event) => setSessionSearch(event.target.value)}
                 placeholder={t('Search sessions')}
-                className='min-w-0 flex-1 bg-transparent outline-none placeholder:text-[#9b8d7f]'
+                className='placeholder:text-muted-foreground min-w-0 flex-1 bg-transparent outline-none'
               />
             </label>
           </div>
@@ -1115,7 +1115,7 @@ export function ChatConsole(props: ChatConsoleProps) {
               <a
                 key={link.href}
                 href={link.href}
-                className='rounded-xl px-3 py-2 text-sm font-medium text-[#75665b] transition hover:bg-[#fff3df] hover:text-[#1b1511]'
+                className='text-muted-foreground hover:bg-muted hover:text-foreground rounded-xl px-3 py-2 text-sm font-medium transition'
               >
                 {t(link.labelKey)}
               </a>
@@ -1123,7 +1123,7 @@ export function ChatConsole(props: ChatConsoleProps) {
           </nav>
 
           <div className='px-4 pb-3'>
-            <p className='mb-2 px-1 text-[11px] font-medium tracking-wide text-[#9b8d7f] uppercase'>
+            <p className='text-muted-foreground mb-2 px-1 text-[11px] font-medium tracking-wide uppercase'>
               {t('Personal')}
             </p>
             <AccountLinks links={accountLinks} />
@@ -1137,10 +1137,10 @@ export function ChatConsole(props: ChatConsoleProps) {
                 <div
                   key={session.id}
                   className={cn(
-                    'group flex w-full items-center gap-2 rounded-2xl px-2.5 py-2.5 text-left text-[#1b1511] transition',
-                    'hover:bg-[#fff3df]',
+                    'group text-foreground flex w-full items-center gap-2 rounded-2xl px-2.5 py-2.5 text-left transition',
+                    'hover:bg-muted',
                     session.id === activeSessionId &&
-                      'bg-[#fff3df] text-[#1b1511] ring-1 ring-[#f28b61]/35'
+                      'bg-muted text-foreground ring-1 ring-orange-400/35'
                   )}
                 >
                   <button
@@ -1149,20 +1149,20 @@ export function ChatConsole(props: ChatConsoleProps) {
                     type='button'
                   >
                     <div className='flex items-center gap-2'>
-                      <SessionIcon className='size-4 shrink-0 text-[#8a7665]' />
+                      <SessionIcon className='text-muted-foreground size-4 shrink-0' />
                       <span className='truncate text-sm font-medium'>
                         {session.title === 'New chat'
                           ? t('New chat')
                           : session.title}
                       </span>
                     </div>
-                    <p className='mt-0.5 truncate text-xs text-[#8a7665]'>
+                    <p className='text-muted-foreground mt-0.5 truncate text-xs'>
                       {session.model}
                     </p>
                   </button>
                   <button
                     type='button'
-                    className='rounded-md p-1 text-[#8a7665] opacity-0 transition group-hover:opacity-100 hover:bg-[#f6e7cc] hover:text-[#1b1511]'
+                    className='text-muted-foreground hover:bg-accent hover:text-foreground rounded-md p-1 opacity-0 transition group-hover:opacity-100'
                     onClick={() => handleRenameSession(session.id)}
                     aria-label={t('Rename session')}
                   >
@@ -1170,7 +1170,7 @@ export function ChatConsole(props: ChatConsoleProps) {
                   </button>
                   <button
                     type='button'
-                    className='rounded-md p-1 text-[#8a7665] opacity-0 transition group-hover:opacity-100 hover:bg-[#f6e7cc] hover:text-red-600'
+                    className='text-muted-foreground hover:bg-accent rounded-md p-1 opacity-0 transition group-hover:opacity-100 hover:text-red-600'
                     onClick={() => handleDeleteSession(session.id)}
                     aria-label={t('Delete session')}
                   >
@@ -1181,11 +1181,11 @@ export function ChatConsole(props: ChatConsoleProps) {
             })}
           </div>
 
-          <div className='mt-auto border-t border-[#ead9c1] p-3'>
+          <div className='border-border mt-auto border-t p-3'>
             <div className='grid grid-cols-2 gap-2'>
               <Button
                 variant='ghost'
-                className='h-9 justify-center rounded-xl text-xs text-[#75665b] transition hover:bg-[#fff3df] hover:text-[#1b1511]'
+                className='text-muted-foreground hover:bg-muted hover:text-foreground h-9 justify-center rounded-xl text-xs transition'
                 onClick={handleExportSessions}
               >
                 <FileJson className='size-4' />
@@ -1193,7 +1193,7 @@ export function ChatConsole(props: ChatConsoleProps) {
               </Button>
               <Button
                 variant='ghost'
-                className='h-9 justify-center rounded-xl text-xs text-[#75665b] transition hover:bg-[#fff3df] hover:text-[#1b1511]'
+                className='text-muted-foreground hover:bg-muted hover:text-foreground h-9 justify-center rounded-xl text-xs transition'
                 onClick={() => {
                   setGallery([])
                   toast.success(t('Gallery cleared'))
@@ -1206,14 +1206,14 @@ export function ChatConsole(props: ChatConsoleProps) {
           </div>
         </aside>
 
-        <section className='relative flex h-dvh min-h-0 flex-col overflow-hidden bg-[radial-gradient(circle_at_82%_8%,rgba(242,139,97,0.13),transparent_26%),linear-gradient(180deg,#fffaf3,#f7efe4)]'>
-          <div className='relative flex min-h-16 items-center justify-between gap-3 border-b border-[#ead9c1] bg-[#fffaf3]/92 px-3 py-2 backdrop-blur sm:px-4'>
+        <section className='bg-background relative flex h-dvh min-h-0 flex-col overflow-hidden'>
+          <div className='border-border bg-card/92 relative flex min-h-16 items-center justify-between gap-3 border-b px-3 py-2 backdrop-blur sm:px-4'>
             <div className='flex min-w-0 flex-1 items-center gap-3'>
               <Sheet open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
                 <Button
                   size='icon'
                   variant='ghost'
-                  className='size-9 rounded-xl text-[#1b1511] hover:bg-[#f6e7cc] hover:text-[#1b1511] lg:hidden'
+                  className='text-foreground hover:bg-accent hover:text-foreground size-9 rounded-xl lg:hidden'
                   onClick={() => setIsMobileMenuOpen(true)}
                   aria-label={t('Open session menu')}
                 >
@@ -1221,20 +1221,20 @@ export function ChatConsole(props: ChatConsoleProps) {
                 </Button>
                 <SheetContent
                   side='left'
-                  className='w-[300px] border-[#ead9c1] bg-[#fffaf3] p-0 text-[#1b1511] sm:max-w-[320px]'
+                  className='border-border bg-card text-foreground w-[300px] p-0 sm:max-w-[320px]'
                 >
-                  <SheetHeader className='border-b border-[#ead9c1] p-4 text-left'>
-                    <SheetTitle className='text-xl font-semibold text-[#1b1511]'>
+                  <SheetHeader className='border-border border-b p-4 text-left'>
+                    <SheetTitle className='text-foreground text-xl font-semibold'>
                       ccapi
                     </SheetTitle>
-                    <SheetDescription className='text-xs text-[#75665b]'>
+                    <SheetDescription className='text-muted-foreground text-xs'>
                       {t('Chat and images')}
                     </SheetDescription>
                   </SheetHeader>
                   <div className='flex flex-1 flex-col overflow-hidden'>
                     <div className='p-3'>
                       <Button
-                        className='h-10 w-full justify-start rounded-2xl bg-[#1a1715] text-[#fff3df] hover:bg-[#2a2521] hover:text-[#fff3df]'
+                        className='bg-foreground text-background hover:bg-foreground/90 hover:text-background h-10 w-full justify-start rounded-2xl'
                         onClick={() => {
                           handleNewSession(mode)
                           setIsMobileMenuOpen(false)
@@ -1245,15 +1245,15 @@ export function ChatConsole(props: ChatConsoleProps) {
                       </Button>
                     </div>
                     <div className='px-3 pb-3'>
-                      <label className='flex items-center gap-2 rounded-2xl border border-[#ead9c1] bg-[#fffdf8] px-3 py-2.5 text-sm text-[#1b1511]'>
-                        <Search className='size-4 text-[#8a7665]' />
+                      <label className='border-border bg-card text-foreground flex items-center gap-2 rounded-2xl border px-3 py-2.5 text-sm'>
+                        <Search className='text-muted-foreground size-4' />
                         <input
                           value={sessionSearch}
                           onChange={(event) =>
                             setSessionSearch(event.target.value)
                           }
                           placeholder={t('Search sessions')}
-                          className='min-w-0 flex-1 bg-transparent outline-none placeholder:text-[#9b8d7f]'
+                          className='placeholder:text-muted-foreground min-w-0 flex-1 bg-transparent outline-none'
                         />
                       </label>
                     </div>
@@ -1265,7 +1265,7 @@ export function ChatConsole(props: ChatConsoleProps) {
                         <a
                           key={link.href}
                           href={link.href}
-                          className='rounded-xl px-3 py-2 text-sm font-medium text-[#75665b] transition hover:bg-[#fff3df] hover:text-[#1b1511]'
+                          className='text-muted-foreground hover:bg-muted hover:text-foreground rounded-xl px-3 py-2 text-sm font-medium transition'
                           onClick={() => setIsMobileMenuOpen(false)}
                         >
                           {t(link.labelKey)}
@@ -1273,7 +1273,7 @@ export function ChatConsole(props: ChatConsoleProps) {
                       ))}
                     </nav>
                     <div className='px-3 pb-3'>
-                      <p className='mb-2 px-1 text-[11px] font-medium tracking-wide text-[#9b8d7f] uppercase'>
+                      <p className='text-muted-foreground mb-2 px-1 text-[11px] font-medium tracking-wide uppercase'>
                         {t('Personal')}
                       </p>
                       <AccountLinks
@@ -1289,9 +1289,9 @@ export function ChatConsole(props: ChatConsoleProps) {
                           <button
                             key={session.id}
                             className={cn(
-                              'flex w-full items-center gap-2 rounded-2xl px-2.5 py-2.5 text-left text-[#1b1511] transition hover:bg-[#fff3df]',
+                              'text-foreground hover:bg-muted flex w-full items-center gap-2 rounded-2xl px-2.5 py-2.5 text-left transition',
                               session.id === activeSessionId &&
-                                'bg-[#fff3df] text-[#1b1511] ring-1 ring-[#f28b61]/35'
+                                'bg-muted text-foreground ring-1 ring-orange-400/35'
                             )}
                             type='button'
                             onClick={() => {
@@ -1299,14 +1299,14 @@ export function ChatConsole(props: ChatConsoleProps) {
                               setIsMobileMenuOpen(false)
                             }}
                           >
-                            <SessionIcon className='size-4 shrink-0 text-[#8a7665]' />
+                            <SessionIcon className='text-muted-foreground size-4 shrink-0' />
                             <span className='min-w-0 flex-1'>
                               <span className='block truncate text-sm font-medium'>
                                 {session.title === 'New chat'
                                   ? t('New chat')
                                   : session.title}
                               </span>
-                              <span className='block truncate text-xs text-[#8a7665]'>
+                              <span className='text-muted-foreground block truncate text-xs'>
                                 {session.model}
                               </span>
                             </span>
@@ -1314,10 +1314,10 @@ export function ChatConsole(props: ChatConsoleProps) {
                         )
                       })}
                     </div>
-                    <div className='mt-auto grid grid-cols-2 gap-2 border-t border-[#ead9c1] p-3'>
+                    <div className='border-border mt-auto grid grid-cols-2 gap-2 border-t p-3'>
                       <Button
                         variant='ghost'
-                        className='h-9 justify-center rounded-lg text-xs text-[#75665b] hover:bg-[#fff3df] hover:text-[#1b1511]'
+                        className='text-muted-foreground hover:bg-muted hover:text-foreground h-9 justify-center rounded-lg text-xs'
                         onClick={handleExportSessions}
                       >
                         <FileJson className='size-4' />
@@ -1325,7 +1325,7 @@ export function ChatConsole(props: ChatConsoleProps) {
                       </Button>
                       <Button
                         variant='ghost'
-                        className='h-9 justify-center rounded-lg text-xs text-[#75665b] hover:bg-[#fff3df] hover:text-[#1b1511]'
+                        className='text-muted-foreground hover:bg-muted hover:text-foreground h-9 justify-center rounded-lg text-xs'
                         onClick={() => {
                           setGallery([])
                           toast.success(t('Gallery cleared'))
@@ -1340,16 +1340,16 @@ export function ChatConsole(props: ChatConsoleProps) {
               </Sheet>
               <div className='min-w-0 flex-1 sm:flex-none'>
                 <div className='flex min-w-0 items-center gap-2'>
-                  <h2 className='max-w-[52vw] truncate text-base font-semibold text-[#1b1511] sm:max-w-[34vw] lg:max-w-[420px]'>
+                  <h2 className='text-foreground max-w-[52vw] truncate text-base font-semibold sm:max-w-[34vw] lg:max-w-[420px]'>
                     {activeSession?.title === 'New chat'
                       ? t('New chat')
                       : (activeSession?.title ?? t('New chat'))}
                   </h2>
-                  <span className='rounded-full bg-[#fff3df] px-2 py-0.5 text-xs text-[#75665b] ring-1 ring-[#ead9c1]'>
+                  <span className='bg-muted text-muted-foreground ring-border rounded-full px-2 py-0.5 text-xs ring-1'>
                     {selectedModeLabel}
                   </span>
                 </div>
-                <p className='hidden truncate text-xs text-[#75665b] sm:block'>
+                <p className='text-muted-foreground hidden truncate text-xs sm:block'>
                   {t('Chat and images stay in the same conversation.')}
                 </p>
                 <select
@@ -1365,7 +1365,7 @@ export function ChatConsole(props: ChatConsoleProps) {
                   disabled={
                     mode === 'chat' && (isModelsLoading || models.length === 0)
                   }
-                  className='mt-1 block w-full max-w-[calc(100vw-5.5rem)] rounded-lg border border-[#ead9c1] bg-[#fffdf8] px-2 py-1 text-xs text-[#75665b] outline-none focus:border-[#d36f4c] sm:hidden'
+                  className='border-border bg-card text-muted-foreground mt-1 block w-full max-w-[calc(100vw-5.5rem)] rounded-lg border px-2 py-1 text-xs outline-none focus:border-orange-400 sm:hidden'
                 >
                   {mode === 'image' ? (
                     imageModelOptions.map((model) => (
@@ -1397,7 +1397,7 @@ export function ChatConsole(props: ChatConsoleProps) {
                 disabled={
                   mode === 'chat' && (isModelsLoading || models.length === 0)
                 }
-                className='hidden max-w-[240px] rounded-xl border border-[#ead9c1] bg-[#fffdf8] px-2.5 py-1.5 text-sm text-[#75665b] transition outline-none focus:border-[#d36f4c] sm:block'
+                className='border-border bg-card text-muted-foreground hidden max-w-[240px] rounded-xl border px-2.5 py-1.5 text-sm transition outline-none focus:border-orange-400 sm:block'
               >
                 {mode === 'image' ? (
                   imageModelOptions.map((model) => (
@@ -1417,14 +1417,14 @@ export function ChatConsole(props: ChatConsoleProps) {
               </select>
             </div>
             <nav
-              className='hidden items-center gap-1 rounded-full bg-[#fff3df]/80 p-1 ring-1 ring-[#ead9c1] xl:flex'
+              className='bg-muted/80 ring-border hidden items-center gap-1 rounded-full p-1 ring-1 xl:flex'
               aria-label={t('Main navigation')}
             >
               {CHAT_NAV_LINKS.map((link) => (
                 <a
                   key={link.href}
                   href={link.href}
-                  className='rounded-full px-3 py-1.5 text-xs font-medium text-[#75665b] transition hover:bg-[#1a1715] hover:text-[#fff3df]'
+                  className='text-muted-foreground hover:bg-foreground hover:text-background rounded-full px-3 py-1.5 text-xs font-medium transition'
                 >
                   {t(link.labelKey)}
                 </a>
@@ -1432,18 +1432,18 @@ export function ChatConsole(props: ChatConsoleProps) {
             </nav>
             <a
               href='/wallet#wallet-add-funds'
-              className='hidden items-center gap-1.5 rounded-full border border-[#ead9c1] bg-[#fffdf8]/85 px-3 py-1.5 text-xs font-medium text-[#75665b] shadow-sm transition hover:border-[#d36f4c]/45 hover:bg-[#fff3df] hover:text-[#1b1511] md:inline-flex'
+              className='border-border bg-card/85 text-muted-foreground hover:bg-muted hover:text-foreground hidden items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium shadow-sm transition hover:border-orange-400/45 md:inline-flex'
             >
-              <CreditCard className='size-3.5 text-[#d36f4c]' />
+              <CreditCard className='size-3.5 text-orange-400' />
               {t('Recharge')}
             </a>
             <a
               href={purchaseCodeHref}
               target={isPurchaseCodeExternal ? '_blank' : undefined}
               rel={isPurchaseCodeExternal ? 'noopener noreferrer' : undefined}
-              className='hidden items-center gap-1.5 rounded-full border border-[#ead9c1] bg-[#fffdf8]/85 px-3 py-1.5 text-xs font-medium text-[#75665b] shadow-sm transition hover:border-[#d36f4c]/45 hover:bg-[#fff3df] hover:text-[#1b1511] 2xl:inline-flex'
+              className='border-border bg-card/85 text-muted-foreground hover:bg-muted hover:text-foreground hidden items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium shadow-sm transition hover:border-orange-400/45 2xl:inline-flex'
             >
-              <Ticket className='size-3.5 text-[#d36f4c]' />
+              <Ticket className='size-3.5 text-orange-400' />
               {t('Buy redemption code')}
             </a>
             <div className='hidden gap-2 text-xs md:flex'>
@@ -1483,12 +1483,12 @@ export function ChatConsole(props: ChatConsoleProps) {
             </div>
           </div>
 
-          <div className='border-t border-[#ead9c1]/80 bg-[#fffaf3]/95 px-2 pt-2 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur sm:px-3 sm:pt-3 sm:pb-5'>
+          <div className='border-border/80 bg-card/95 border-t px-2 pt-2 pb-[calc(0.75rem+env(safe-area-inset-bottom))] backdrop-blur sm:px-3 sm:pt-3 sm:pb-5'>
             <div className='mx-auto max-w-3xl'>
-              <details className='mb-2 overflow-hidden rounded-2xl border border-[#ead9c1] bg-[#fffdf8]/90 px-3 py-2 text-sm text-[#75665b] shadow-sm transition open:border-[#d36f4c]/35'>
+              <details className='border-border bg-card/90 text-muted-foreground mb-2 overflow-hidden rounded-2xl border px-3 py-2 text-sm shadow-sm transition open:border-orange-400/35'>
                 <summary className='cursor-pointer overflow-hidden text-ellipsis whitespace-nowrap outline-none select-none'>
                   {t('Advanced settings')}
-                  <span className='ml-2 text-xs text-[#8a7665]'>
+                  <span className='text-muted-foreground ml-2 text-xs'>
                     {mode === 'image'
                       ? `${t('Image generation')} · ${resolvedImageAdapter}`
                       : selectedModel}
@@ -1505,7 +1505,7 @@ export function ChatConsole(props: ChatConsoleProps) {
                         }))
                       }
                       disabled={isModelsLoading || models.length === 0}
-                      className='w-full rounded-lg border border-[#ead9c1] bg-[#fffaf3] px-2 py-1 text-[#1b1511] focus:border-[#d36f4c]'
+                      className='border-border bg-card text-foreground w-full rounded-lg border px-2 py-1 focus:border-orange-400'
                     >
                       {models.length === 0 ? (
                         <option value={settings.model}>{settings.model}</option>
@@ -1531,7 +1531,7 @@ export function ChatConsole(props: ChatConsoleProps) {
                           temperature: Number(event.target.value),
                         }))
                       }
-                      className='w-full rounded-lg border border-[#ead9c1] bg-[#fffaf3] px-2 py-1 text-[#1b1511] focus:border-[#d36f4c]'
+                      className='border-border bg-card text-foreground w-full rounded-lg border px-2 py-1 focus:border-orange-400'
                     />
                   </SimpleField>
                   <SimpleField label='Top P'>
@@ -1547,7 +1547,7 @@ export function ChatConsole(props: ChatConsoleProps) {
                           topP: Number(event.target.value),
                         }))
                       }
-                      className='w-full rounded-lg border border-[#ead9c1] bg-[#fffaf3] px-2 py-1 text-[#1b1511] focus:border-[#d36f4c]'
+                      className='border-border bg-card text-foreground w-full rounded-lg border px-2 py-1 focus:border-orange-400'
                     />
                   </SimpleField>
                   <SimpleField label={t('Max tokens')}>
@@ -1562,7 +1562,7 @@ export function ChatConsole(props: ChatConsoleProps) {
                           maxTokens: Number(event.target.value),
                         }))
                       }
-                      className='w-full rounded-lg border border-[#ead9c1] bg-[#fffaf3] px-2 py-1 text-[#1b1511] focus:border-[#d36f4c]'
+                      className='border-border bg-card text-foreground w-full rounded-lg border px-2 py-1 focus:border-orange-400'
                     />
                   </SimpleField>
                   <SimpleField label={t('Group')}>
@@ -1574,7 +1574,7 @@ export function ChatConsole(props: ChatConsoleProps) {
                           group: event.target.value,
                         }))
                       }
-                      className='w-full rounded-lg border border-[#ead9c1] bg-[#fffaf3] px-2 py-1 text-[#1b1511] focus:border-[#d36f4c]'
+                      className='border-border bg-card text-foreground w-full rounded-lg border px-2 py-1 focus:border-orange-400'
                     >
                       <option value={ACCOUNT_DEFAULT_GROUP}>
                         {t('Account default')}
@@ -1587,7 +1587,7 @@ export function ChatConsole(props: ChatConsoleProps) {
                     </select>
                   </SimpleField>
                   <SimpleField label='Stream'>
-                    <label className='flex h-9 items-center gap-2 rounded-lg border border-[#ead9c1] bg-[#fffaf3] px-2 text-[#1b1511]'>
+                    <label className='border-border bg-card text-foreground flex h-9 items-center gap-2 rounded-lg border px-2'>
                       <input
                         type='checkbox'
                         checked={settings.stream}
@@ -1597,7 +1597,7 @@ export function ChatConsole(props: ChatConsoleProps) {
                             stream: event.target.checked,
                           }))
                         }
-                        className='accent-[#d36f4c]'
+                        className='accent-orange-500'
                       />
                       <span className='text-sm'>{t('Streaming')}</span>
                     </label>
@@ -1612,7 +1612,7 @@ export function ChatConsole(props: ChatConsoleProps) {
                             .value as ImageGenerationAdapter,
                         }))
                       }
-                      className='w-full rounded-lg border border-[#ead9c1] bg-[#fffaf3] px-2 py-1 text-[#1b1511] focus:border-[#d36f4c]'
+                      className='border-border bg-card text-foreground w-full rounded-lg border px-2 py-1 focus:border-orange-400'
                     >
                       {IMAGE_ADAPTERS.map((adapter) => (
                         <option key={adapter.value} value={adapter.value}>
@@ -1631,7 +1631,7 @@ export function ChatConsole(props: ChatConsoleProps) {
                           imageModel: event.target.value,
                         }))
                       }
-                      className='w-full rounded-lg border border-[#ead9c1] bg-[#fffaf3] px-2 py-1 text-[#1b1511] focus:border-[#d36f4c]'
+                      className='border-border bg-card text-foreground w-full rounded-lg border px-2 py-1 focus:border-orange-400'
                     />
                     <datalist id='ccapi-image-models'>
                       {imageModelOptions.map((model) => (
@@ -1650,7 +1650,7 @@ export function ChatConsole(props: ChatConsoleProps) {
                           imageSize: event.target.value,
                         }))
                       }
-                      className='w-full rounded-lg border border-[#ead9c1] bg-[#fffaf3] px-2 py-1 text-[#1b1511] focus:border-[#d36f4c]'
+                      className='border-border bg-card text-foreground w-full rounded-lg border px-2 py-1 focus:border-orange-400'
                     >
                       <option value='1024x1024'>1024x1024</option>
                       <option value='1024x1536'>1024x1536</option>
@@ -1666,7 +1666,7 @@ export function ChatConsole(props: ChatConsoleProps) {
                           imageCount: Number(event.target.value),
                         }))
                       }
-                      className='w-full rounded-lg border border-[#ead9c1] bg-[#fffaf3] px-2 py-1 text-[#1b1511] focus:border-[#d36f4c]'
+                      className='border-border bg-card text-foreground w-full rounded-lg border px-2 py-1 focus:border-orange-400'
                     >
                       {[1, 2, 3, 4].map((count) => (
                         <option key={count} value={count}>
@@ -1684,7 +1684,7 @@ export function ChatConsole(props: ChatConsoleProps) {
                           imageStyle: event.target.value,
                         }))
                       }
-                      className='w-full rounded-lg border border-[#ead9c1] bg-[#fffaf3] px-2 py-1 text-[#1b1511] focus:border-[#d36f4c]'
+                      className='border-border bg-card text-foreground w-full rounded-lg border px-2 py-1 focus:border-orange-400'
                     >
                       {IMAGE_STYLES.map((style) => (
                         <option key={style.value} value={style.value}>
@@ -1703,14 +1703,14 @@ export function ChatConsole(props: ChatConsoleProps) {
                         }))
                       }
                       placeholder={t('Things to avoid in the image')}
-                      className='w-full rounded-lg border border-[#ead9c1] bg-[#fffaf3] px-2 py-1 text-[#1b1511] placeholder:text-[#aa9a88] focus:border-[#d36f4c]'
+                      className='border-border bg-card text-foreground placeholder:text-muted-foreground w-full rounded-lg border px-2 py-1 focus:border-orange-400'
                     />
                   </SimpleField>
                 </div>
               </details>
             </div>
-            <div className='mx-auto max-w-3xl rounded-[22px] border border-[#ead9c1] bg-[#fffdf8] p-2 shadow-[0_24px_80px_rgba(91,58,34,0.12)] transition focus-within:border-[#d36f4c]/55 focus-within:ring-4 focus-within:ring-[#d36f4c]/10 sm:rounded-[30px]'>
-              <div className='flex items-center justify-between px-2 pb-1 text-xs text-[#75665b]'>
+            <div className='border-border bg-card mx-auto max-w-3xl rounded-[22px] border p-2 shadow-[0_24px_80px_rgba(91,58,34,0.12)] transition focus-within:border-orange-400/55 focus-within:ring-4 focus-within:ring-orange-400/10 sm:rounded-[30px]'>
+              <div className='text-muted-foreground flex items-center justify-between px-2 pb-1 text-xs'>
                 <span className='truncate'>
                   {mode === 'image'
                     ? `${t('Images will be generated inside this conversation')} · ${t(
@@ -1735,7 +1735,7 @@ export function ChatConsole(props: ChatConsoleProps) {
                     ? t('Describe what you want to generate')
                     : t('Type a message')
                 }
-                className='min-h-20 resize-none border-0 bg-transparent text-base leading-7 text-[#1b1511] shadow-none placeholder:text-[#aa9a88] focus-visible:ring-0 sm:min-h-24'
+                className='text-foreground placeholder:text-muted-foreground min-h-20 resize-none border-0 bg-transparent text-base leading-7 shadow-none focus-visible:ring-0 sm:min-h-24'
                 disabled={isGenerating}
               />
               <div className='flex flex-wrap items-center justify-between gap-3 pt-2'>
@@ -1763,7 +1763,7 @@ export function ChatConsole(props: ChatConsoleProps) {
                 {isGenerating ? (
                   <Button
                     onClick={handleStop}
-                    className='rounded-full bg-[#1a1715] text-[#fff3df] shadow-sm transition hover:bg-[#2a2521] hover:text-[#fff3df]'
+                    className='bg-foreground text-background hover:bg-foreground/90 hover:text-background rounded-full shadow-sm transition'
                   >
                     <Square className='size-4 fill-current' />
                     {t('Stop')}
@@ -1772,7 +1772,7 @@ export function ChatConsole(props: ChatConsoleProps) {
                   <Button
                     onClick={handleSubmit}
                     disabled={!input.trim()}
-                    className='rounded-full bg-[#1a1715] text-[#fff3df] shadow-sm transition hover:bg-[#2a2521] hover:text-[#fff3df] disabled:bg-[#ead9c1] disabled:text-[#9b8d7f]'
+                    className='bg-foreground text-background hover:bg-foreground/90 hover:text-background disabled:bg-muted disabled:text-muted-foreground rounded-full shadow-sm transition'
                   >
                     <Send className='size-4' />
                     {t('Send')}
@@ -1807,9 +1807,9 @@ function AccountLinks(props: {
             target={link.external ? '_blank' : undefined}
             rel={link.external ? 'noopener noreferrer' : undefined}
             onClick={props.onNavigate}
-            className='group flex items-center gap-2 rounded-xl border border-transparent px-2.5 py-2 text-sm font-medium text-[#75665b] transition hover:border-[#ead9c1] hover:bg-[#fff3df] hover:text-[#1b1511]'
+            className='group text-muted-foreground hover:border-border hover:bg-muted hover:text-foreground flex items-center gap-2 rounded-xl border border-transparent px-2.5 py-2 text-sm font-medium transition'
           >
-            <Icon className='size-4 shrink-0 text-[#b86a48] transition group-hover:text-[#d36f4c]' />
+            <Icon className='size-4 shrink-0 text-orange-400 transition group-hover:text-orange-400' />
             <span className='min-w-0 truncate'>{link.label}</span>
           </a>
         )
@@ -1828,9 +1828,9 @@ function StatusPill(props: {
   const toneClass =
     props.tone === 'warning'
       ? 'border-amber-500/30 bg-amber-500/10 text-amber-700'
-      : 'border-[#ead9c1] bg-[#fffdf8]/85 text-[#75665b]'
+      : 'border-border bg-card/85 text-muted-foreground'
   const iconClass =
-    props.tone === 'warning' ? 'text-amber-700' : 'text-[#d36f4c]'
+    props.tone === 'warning' ? 'text-amber-700' : 'text-orange-400'
 
   return (
     <span
@@ -1865,9 +1865,9 @@ function ModeButton(props: {
       aria-pressed={props.active}
       onClick={props.onClick}
       className={cn(
-        'h-9 rounded-full border-[#ead9c1] bg-transparent px-3 text-[#75665b] transition hover:bg-[#fff3df] hover:text-[#1b1511]',
+        'border-border text-muted-foreground hover:bg-muted hover:text-foreground h-9 rounded-full bg-transparent px-3 transition',
         props.active &&
-          'border-[#d36f4c] bg-[#f28b61] text-[#22110d] shadow-sm hover:bg-[#ff9d73] hover:text-[#22110d]'
+          'border-orange-400 bg-orange-400 text-zinc-950 shadow-sm hover:bg-orange-300 hover:text-zinc-950'
       )}
     >
       <Icon className='size-4' />
@@ -1898,7 +1898,7 @@ function ChatBubble(props: {
       )}
     >
       {!isUser && (
-        <div className='mt-1 flex size-8 shrink-0 items-center justify-center rounded-full bg-[#1a1715] text-xs font-semibold text-[#fff3df] ring-1 ring-[#ead9c1]'>
+        <div className='bg-foreground text-background ring-border mt-1 flex size-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold ring-1'>
           c
         </div>
       )}
@@ -1906,15 +1906,15 @@ function ChatBubble(props: {
         className={cn(
           'max-w-[min(82%,680px)] text-sm leading-7',
           isUser &&
-            'rounded-[24px] bg-[#fff3df] px-4 py-2.5 text-[#1b1511] shadow-sm ring-1 ring-[#ead9c1]',
-          !isUser && 'min-w-0 flex-1 text-[#1b1511]',
+            'bg-muted text-foreground ring-border rounded-[24px] px-4 py-2.5 shadow-sm ring-1',
+          !isUser && 'text-foreground min-w-0 flex-1',
           isError && 'rounded-2xl bg-red-50 px-4 py-3 text-red-700'
         )}
       >
         {!isUser && (
-          <div className='mb-1 flex items-center gap-2 text-xs font-medium text-[#75665b]'>
+          <div className='text-muted-foreground mb-1 flex items-center gap-2 text-xs font-medium'>
             <span>ccapi</span>
-            <span className='rounded-full bg-[#fff3df] px-2 py-0.5 text-[11px] text-[#75665b] ring-1 ring-[#ead9c1]'>
+            <span className='bg-muted text-muted-foreground ring-border rounded-full px-2 py-0.5 text-[11px] ring-1'>
               {modeBadge}
             </span>
             {props.message.status === 'streaming' && (
@@ -1923,17 +1923,17 @@ function ChatBubble(props: {
           </div>
         )}
         {isUser && messageMode === 'image' && (
-          <div className='mb-1 text-[11px] font-medium text-[#75665b]'>
+          <div className='text-muted-foreground mb-1 text-[11px] font-medium'>
             {t('Image request')}
           </div>
         )}
         {isUser && props.message.status === 'streaming' && (
-          <div className='mb-1 flex items-center gap-2 text-xs text-[#75665b]'>
+          <div className='text-muted-foreground mb-1 flex items-center gap-2 text-xs'>
             <Loader2 className='size-3.5 animate-spin' />
           </div>
         )}
         {props.message.reasoning && (
-          <div className='mb-3 rounded-xl bg-[#fff3df] p-3 text-xs text-[#75665b]'>
+          <div className='bg-muted text-muted-foreground mb-3 rounded-xl p-3 text-xs'>
             {props.message.reasoning}
           </div>
         )}
@@ -1941,7 +1941,7 @@ function ChatBubble(props: {
           (generatedImages.length > 0 ? (
             <GeneratedImageGrid images={generatedImages} />
           ) : (
-            <Response className='prose prose-stone prose-a:text-[#a95736] max-w-none text-sm leading-7 break-words'>
+            <Response className='prose prose-stone prose-a:text-orange-400 max-w-none text-sm leading-7 break-words'>
               {bodyContent}
             </Response>
           ))}
@@ -1954,7 +1954,7 @@ function ChatBubble(props: {
           <Button
             size='icon'
             variant='ghost'
-            className='size-8 rounded-lg text-[#75665b] hover:bg-[#fff3df] hover:text-[#1b1511]'
+            className='text-muted-foreground hover:bg-muted hover:text-foreground size-8 rounded-lg'
             onClick={() => {
               void navigator.clipboard.writeText(props.message.content)
               toast.success(t('Copied'))
@@ -1967,7 +1967,7 @@ function ChatBubble(props: {
             <Button
               size='icon'
               variant='ghost'
-              className='size-8 rounded-lg text-[#75665b] hover:bg-[#fff3df] hover:text-[#1b1511]'
+              className='text-muted-foreground hover:bg-muted hover:text-foreground size-8 rounded-lg'
               onClick={props.onRegenerate}
               aria-label={t('Regenerate')}
             >
@@ -1989,22 +1989,22 @@ function GeneratedImageGrid(props: {
       {props.images.map((image, index) => (
         <figure
           key={`${image.url}-${index}`}
-          className='overflow-hidden rounded-[22px] border border-[#ead9c1] bg-[#fffdf8] shadow-[0_18px_56px_rgba(91,58,34,0.14)]'
+          className='border-border bg-card overflow-hidden rounded-[22px] border shadow-[0_18px_56px_rgba(91,58,34,0.14)]'
         >
           <img
             src={image.url}
             alt={image.alt}
-            className='aspect-square max-h-[520px] w-full bg-[#1a1715] object-contain'
+            className='bg-foreground aspect-square max-h-[520px] w-full object-contain'
           />
-          <figcaption className='flex items-center justify-between gap-2 bg-[#fffaf3]/95 p-2'>
-            <span className='min-w-0 truncate text-xs text-[#75665b]'>
+          <figcaption className='bg-card/95 flex items-center justify-between gap-2 p-2'>
+            <span className='text-muted-foreground min-w-0 truncate text-xs'>
               {image.alt}
             </span>
             <span className='flex shrink-0 gap-1'>
               <Button
                 size='icon'
                 variant='ghost'
-                className='size-8 text-[#75665b] hover:bg-[#fff3df] hover:text-[#1b1511]'
+                className='text-muted-foreground hover:bg-muted hover:text-foreground size-8'
                 onClick={() => {
                   void navigator.clipboard.writeText(image.alt)
                   toast.success(t('Copied'))
@@ -2016,7 +2016,7 @@ function GeneratedImageGrid(props: {
               <Button
                 size='icon'
                 variant='ghost'
-                className='size-8 text-[#75665b] hover:bg-[#fff3df] hover:text-[#1b1511]'
+                className='text-muted-foreground hover:bg-muted hover:text-foreground size-8'
                 asChild
                 aria-label={t('Download')}
               >
@@ -2041,10 +2041,10 @@ function EmptyState(props: {
 
   return (
     <div className='flex min-h-[56vh] flex-col items-center justify-center text-center'>
-      <h3 className='text-3xl font-semibold tracking-tight text-[#1b1511]'>
+      <h3 className='text-foreground text-3xl font-semibold tracking-tight'>
         {title}
       </h3>
-      <p className='mx-auto mt-3 max-w-lg text-sm text-[#75665b]'>
+      <p className='text-muted-foreground mx-auto mt-3 max-w-lg text-sm'>
         {props.mode === 'image'
           ? t(
               '当前是生图模式，发出去就会调用图片模型。点下面的聊天可随时切回问答。'
@@ -2056,7 +2056,7 @@ function EmptyState(props: {
           <Button
             key={prompt}
             variant='outline'
-            className='rounded-full border-[#ead9c1] bg-[#fffdf8] text-[#75665b] shadow-sm transition hover:bg-[#fff3df] hover:text-[#1b1511]'
+            className='border-border bg-card text-muted-foreground hover:bg-muted hover:text-foreground rounded-full shadow-sm transition'
             onClick={() => props.onPrompt(prompt)}
           >
             {t(prompt)}
@@ -2069,7 +2069,7 @@ function EmptyState(props: {
 
 function SimpleField(props: { label: string; children: React.ReactNode }) {
   return (
-    <label className='block space-y-1 text-xs text-[#75665b]'>
+    <label className='text-muted-foreground block space-y-1 text-xs'>
       <span>{props.label}</span>
       {props.children}
     </label>

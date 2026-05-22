@@ -135,7 +135,7 @@ export function Pricing() {
         siteName='ccapi'
         headerProps={{ className: 'ccapi-public-header' }}
       >
-        <div className='min-h-svh bg-[#fff8ee] px-3 pt-24 pb-8 sm:px-6 sm:pt-28 sm:pb-10 xl:px-8'>
+        <div className='bg-background min-h-svh px-3 pt-24 pb-8 sm:px-6 sm:pt-28 sm:pb-10 xl:px-8'>
           <LoadingSkeleton viewMode={viewMode} />
         </div>
       </PublicLayout>
@@ -149,17 +149,17 @@ export function Pricing() {
       siteName='ccapi'
       headerProps={{ className: 'ccapi-public-header' }}
     >
-      <div className='ccapi-pricing-page min-h-svh bg-[#fff8ee] text-[#211712]'>
+      <div className='ccapi-pricing-page bg-background text-foreground min-h-svh'>
         <PageTransition className='mx-auto w-full max-w-[1800px] px-3 pt-24 pb-8 sm:px-6 sm:pt-28 sm:pb-10 xl:px-8'>
           <header className='mx-auto mb-6 grid max-w-6xl gap-5 pt-4 lg:grid-cols-[1fr_0.72fr] lg:items-end'>
             <div>
-              <p className='mb-3 text-sm font-bold text-[#c95f3f]'>
+              <p className='mb-3 text-sm font-bold text-orange-400'>
                 {t('模型价格表')}
               </p>
-              <h1 className='max-w-3xl text-3xl leading-tight font-black tracking-tight text-[#211712] sm:text-4xl md:text-5xl'>
+              <h1 className='text-foreground max-w-3xl text-3xl leading-tight font-black tracking-tight sm:text-4xl md:text-5xl'>
                 {t('模型价格')}
               </h1>
-              <p className='mt-4 max-w-2xl text-sm leading-7 text-[#6f6257] sm:text-base'>
+              <p className='text-muted-foreground mt-4 max-w-2xl text-sm leading-7 sm:text-base'>
                 {t(
                   '当前可用 {{count}} 个模型。搜索模型名、供应商、端点或标签，快速比较输入价、输出价、缓存价和按次价格。',
                   {
@@ -168,8 +168,8 @@ export function Pricing() {
                 )}
               </p>
             </div>
-            <div className='ccapi-pricing-search-panel min-w-0 rounded-xl border border-[#ead9c1] bg-white p-4 shadow-sm'>
-              <div className='mb-3 text-sm font-bold text-[#4c4037]'>
+            <div className='ccapi-pricing-search-panel border-border bg-card min-w-0 rounded-xl border p-4 shadow-sm'>
+              <div className='text-foreground mb-3 text-sm font-bold'>
                 {t('快速搜索')}
               </div>
               <SearchBar
@@ -182,17 +182,19 @@ export function Pricing() {
                 className='ccapi-pricing-search'
               />
               <div className='mt-4 grid grid-cols-3 gap-2 text-center text-xs'>
-                <div className='ccapi-pricing-stat rounded-md border border-[#ead9c1] bg-[#fff8ee] px-2 py-3'>
-                  <div className='font-black text-[#211712]'>/1M</div>
-                  <div className='mt-1 text-[#6f6257]'>{t('Token')}</div>
+                <div className='ccapi-pricing-stat border-border bg-background rounded-md border px-2 py-3'>
+                  <div className='text-foreground font-black'>/1M</div>
+                  <div className='text-muted-foreground mt-1'>{t('Token')}</div>
                 </div>
-                <div className='ccapi-pricing-stat rounded-md border border-[#ead9c1] bg-[#fff8ee] px-2 py-3'>
-                  <div className='font-black text-[#211712]'>CNY</div>
-                  <div className='mt-1 text-[#6f6257]'>{t('Recharge')}</div>
+                <div className='ccapi-pricing-stat border-border bg-background rounded-md border px-2 py-3'>
+                  <div className='text-foreground font-black'>CNY</div>
+                  <div className='text-muted-foreground mt-1'>
+                    {t('Recharge')}
+                  </div>
                 </div>
-                <div className='ccapi-pricing-stat rounded-md border border-[#ead9c1] bg-[#fff8ee] px-2 py-3'>
-                  <div className='font-black text-[#211712]'>API</div>
-                  <div className='mt-1 text-[#6f6257]'>{t('Ready')}</div>
+                <div className='ccapi-pricing-stat border-border bg-background rounded-md border px-2 py-3'>
+                  <div className='text-foreground font-black'>API</div>
+                  <div className='text-muted-foreground mt-1'>{t('Ready')}</div>
                 </div>
               </div>
             </div>
