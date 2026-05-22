@@ -17,10 +17,18 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { useState, useCallback } from 'react'
-import { Check, Copy, Loader2 } from 'lucide-react'
+import { Check, Copy, Link, Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import { copyToClipboard } from '@/lib/copy-to-clipboard'
 import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuShortcut,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
 import {
   Popover,
   PopoverContent,
@@ -32,6 +40,10 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { StatusBadge } from '@/components/status-badge'
+import {
+  encodeConnectionString,
+  getServerAddress,
+} from '../lib/connection-info'
 import { type ApiKey } from '../types'
 import { useApiKeys } from './api-keys-provider'
 
@@ -65,9 +77,24 @@ export function ApiKeyCell({ apiKey }: { apiKey: ApiKey }) {
     const realKey = resolvedFullKey || (await resolveRealKey(apiKey.id))
     if (realKey) {
       const ok = await copyToClipboard(realKey)
-      if (ok) markKeyCopied(apiKey.id)
+      if (ok) {
+        markKeyCopied(apiKey.id)
+        toast.success(t('Copied'))
+      }
     }
-  }, [resolvedFullKey, resolveRealKey, apiKey.id, markKeyCopied])
+  }, [resolvedFullKey, resolveRealKey, apiKey.id, markKeyCopied, t])
+
+  const handleCopyConnectionInfo = useCallback(async () => {
+    const realKey = resolvedFullKey || (await resolveRealKey(apiKey.id))
+    if (!realKey) return
+
+    const connectionInfo = encodeConnectionString(realKey, getServerAddress())
+    const ok = await copyToClipboard(connectionInfo)
+    if (ok) {
+      markKeyCopied(apiKey.id)
+      toast.success(t('Copied'))
+    }
+  }, [resolvedFullKey, resolveRealKey, apiKey.id, markKeyCopied, t])
 
   return (
     <div className='flex items-center'>
@@ -108,15 +135,15 @@ export function ApiKeyCell({ apiKey }: { apiKey: ApiKey }) {
           </div>
         </PopoverContent>
       </Popover>
-      <Tooltip>
-        <TooltipTrigger
+      <DropdownMenu modal={false}>
+        <DropdownMenuTrigger
           render={
             <Button
               variant='ghost'
               size='icon'
               className='size-7 shrink-0'
-              onClick={handleCopy}
               disabled={isLoading}
+              aria-label={t('Copy API key')}
             />
           }
         >
@@ -127,15 +154,22 @@ export function ApiKeyCell({ apiKey }: { apiKey: ApiKey }) {
           ) : (
             <Copy className='size-3.5' />
           )}
-        </TooltipTrigger>
-        <TooltipContent>
-          {isLoading
-            ? t('Loading...')
-            : isCopied
-              ? t('Copied!')
-              : t('Copy API key')}
-        </TooltipContent>
-      </Tooltip>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align='end' className='w-44'>
+          <DropdownMenuItem onClick={handleCopy}>
+            {t('Copy Key')}
+            <DropdownMenuShortcut>
+              <Copy size={16} />
+            </DropdownMenuShortcut>
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={handleCopyConnectionInfo}>
+            {t('Copy Connection Info')}
+            <DropdownMenuShortcut>
+              <Link size={16} />
+            </DropdownMenuShortcut>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   )
 }
