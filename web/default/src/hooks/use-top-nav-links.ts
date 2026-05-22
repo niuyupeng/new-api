@@ -16,7 +16,7 @@ const DEFAULT_HEADER_NAV_MODULES = {
   pricing: { enabled: true, requireAuth: false },
   docs: true,
   console: true,
-  about: false,
+  about: true,
 }
 
 /**
@@ -66,26 +66,26 @@ export function useTopNavLinks(): TopNavLink[] {
   const pricing = modules?.pricing
   if (pricing && typeof pricing === 'object' && pricing.enabled) {
     const disabled = pricing.requireAuth && !isAuthed
-    links.push({ title: t('价格'), href: '/pricing', disabled })
+    links.push({ title: t('模型广场'), href: '/pricing', disabled })
   }
 
   // Docs (supports external links)
   if (modules?.docs !== false) {
     if (docsLink) {
-      links.push({ title: t('接入文档'), href: docsLink, external: true })
+      links.push({ title: t('文档'), href: docsLink, external: true })
     } else {
-      links.push({ title: t('接入文档'), href: '/docs' })
+      links.push({ title: t('文档'), href: '/docs' })
     }
   }
 
   // Console -> /dashboard (new console path)
   if (modules?.console !== false) {
-    links.push({ title: t('控制台'), href: '/dashboard' })
+    links.push({ title: t('控制台首页'), href: '/dashboard/overview' })
   }
 
   // About
   if (modules?.about !== false) {
-    links.push({ title: t('About'), href: '/about' })
+    links.push({ title: t('关于'), href: '/about' })
   }
 
   return links
