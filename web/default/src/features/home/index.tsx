@@ -25,6 +25,14 @@ import { ccapiPublicNavLinks } from '@/features/ccapi/public-nav'
 import { CTA, Features, Hero, HowItWorks, Stats, Trust } from './components'
 import { useHomePageContent } from './hooks'
 
+const ccapiHeaderProps = {
+  navLinks: ccapiPublicNavLinks,
+  siteName: 'ccapi',
+  headerProps: {
+    className: 'ccapi-public-header',
+  },
+} as const
+
 export function Home() {
   const { t } = useTranslation()
   const { auth } = useAuthStore()
@@ -33,7 +41,7 @@ export function Home() {
 
   if (!isLoaded) {
     return (
-      <PublicLayout showMainContainer={false}>
+      <PublicLayout showMainContainer={false} {...ccapiHeaderProps}>
         <main className='flex min-h-svh items-center justify-center'>
           <div className='text-muted-foreground'>{t('Loading...')}</div>
         </main>
@@ -43,7 +51,7 @@ export function Home() {
 
   if (content) {
     return (
-      <PublicLayout showMainContainer={false}>
+      <PublicLayout showMainContainer={false} {...ccapiHeaderProps}>
         <main className='overflow-x-hidden'>
           {isUrl ? (
             <iframe
@@ -62,14 +70,7 @@ export function Home() {
   }
 
   return (
-    <PublicLayout
-      showMainContainer={false}
-      navLinks={ccapiPublicNavLinks}
-      siteName='ccapi'
-      headerProps={{
-        className: 'ccapi-public-header',
-      }}
-    >
+    <PublicLayout showMainContainer={false} {...ccapiHeaderProps}>
       <Hero isAuthenticated={isAuthenticated} />
       <Stats />
       <Features />

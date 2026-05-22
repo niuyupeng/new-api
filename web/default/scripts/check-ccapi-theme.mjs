@@ -27,6 +27,7 @@ const guardedFiles = [
   'src/features/chat-console/index.tsx',
   'src/features/ccapi/public-nav.ts',
   'src/features/docs/index.tsx',
+  'src/features/home/index.tsx',
   'src/features/pricing/index.tsx',
   'src/components/layout/components/public-header.tsx',
   'src/components/layout/components/system-brand.tsx',
@@ -40,6 +41,11 @@ const guardedFiles = [
 
 const requiredTokens = {
   'src/features/auth/auth-layout.tsx': ['ccapi-auth-shell', 'bg-background'],
+  'src/features/home/index.tsx': [
+    'ccapiHeaderProps',
+    'navLinks: ccapiPublicNavLinks',
+    "className: 'ccapi-public-header'",
+  ],
   'src/features/chat-console/index.tsx': [
     'bg-background',
     'text-foreground',
