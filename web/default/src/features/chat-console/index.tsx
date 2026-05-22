@@ -483,13 +483,18 @@ export function ChatConsole(props: ChatConsoleProps) {
     select: (response) => response.data ?? null,
   })
 
+  const effectiveModelGroup = useMemo(() => {
+    if (settings.group) return settings.group
+    return user?.group || undefined
+  }, [settings.group, user?.group])
+
   const {
     data: models = [],
     isLoading: isModelsLoading,
     isError: isModelsError,
   } = useQuery({
-    queryKey: ['chat-console-models'],
-    queryFn: getUserModels,
+    queryKey: ['chat-console-models', effectiveModelGroup ?? 'all'],
+    queryFn: () => getUserModels(effectiveModelGroup),
   })
 
   const { data: groups = [] } = useQuery({
@@ -523,6 +528,10 @@ export function ChatConsole(props: ChatConsoleProps) {
     return Array.from(optionMap.values())
   }, [models, settings.imageModel])
 
+  const isSelectedChatModelAvailable = useMemo(() => {
+    return models.some((model) => model.value === settings.model)
+  }, [models, settings.model])
+
   useEffect(() => writeJson(STORAGE_KEYS.sessions, sessions), [sessions])
   useEffect(() => writeJson(STORAGE_KEYS.gallery, gallery), [gallery])
   useEffect(() => writeJson(STORAGE_KEYS.settings, settings), [settings])
@@ -537,6 +546,11 @@ export function ChatConsole(props: ChatConsoleProps) {
     if (hasChatModel) return
     setSettings((prev) => ({ ...prev, model: models[0].value }))
   }, [models, settings.model])
+
+  useEffect(() => {
+    if (!settings.group || isModelsLoading || models.length > 0) return
+    setSettings((prev) => ({ ...prev, group: ACCOUNT_DEFAULT_GROUP }))
+  }, [isModelsLoading, models.length, settings.group])
 
   useEffect(() => {
     if (!settings.group || groups.length === 0) return
@@ -687,7 +701,17 @@ export function ChatConsole(props: ChatConsoleProps) {
   const handleChatSubmit = useCallback(
     async (prompt: string) => {
       if (!activeSession || isGenerating) return
+      if (isModelsLoading) {
+        toast.error(t('Checking API'))
+        return
+      }
       if (!isModelsLoading && models.length === 0) {
+        toast.error(
+          t('No available chat models. Add a channel and enable a model first.')
+        )
+        return
+      }
+      if (!isSelectedChatModelAvailable) {
         toast.error(
           t('No available chat models. Add a channel and enable a model first.')
         )
@@ -791,6 +815,7 @@ export function ChatConsole(props: ChatConsoleProps) {
       appendMessage,
       isGenerating,
       isModelsLoading,
+      isSelectedChatModelAvailable,
       models.length,
       settings.maxTokens,
       settings.model,
