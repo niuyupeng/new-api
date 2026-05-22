@@ -53,7 +53,19 @@ import { registerFormSchema } from '@/features/auth/constants'
 import { useAuthRedirect } from '@/features/auth/hooks/use-auth-redirect'
 import { useEmailVerification } from '@/features/auth/hooks/use-email-verification'
 import { useTurnstile } from '@/features/auth/hooks/use-turnstile'
-import { getAffiliateCode } from '@/features/auth/lib/storage'
+import {
+  getAffiliateCode,
+  saveAffiliateCode,
+} from '@/features/auth/lib/storage'
+
+function getAffiliateCodeFromUrl(): string {
+  if (typeof window === 'undefined') return ''
+  return new URLSearchParams(window.location.search).get('aff')?.trim() ?? ''
+}
+
+function resolveAffiliateCode(): string {
+  return getAffiliateCodeFromUrl() || getAffiliateCode()
+}
 
 export function SignUpForm({
   className,
@@ -66,7 +78,9 @@ export function SignUpForm({
   const [wechatCode, setWeChatCode] = useState('')
   const [isWeChatDialogOpen, setIsWeChatDialogOpen] = useState(false)
   const [isWeChatSubmitting, setIsWeChatSubmitting] = useState(false)
-  const [affiliateCode, setAffiliateCode] = useState('')
+  const [affiliateCode, setAffiliateCode] = useState(() =>
+    resolveAffiliateCode()
+  )
   const legalConsentErrorMessage = t('Please agree to the legal terms first')
 
   const { status } = useStatus()
@@ -132,7 +146,11 @@ export function SignUpForm({
   }, [requiresLegalConsent])
 
   useEffect(() => {
-    setAffiliateCode(getAffiliateCode())
+    const code = resolveAffiliateCode()
+    if (code) {
+      saveAffiliateCode(code)
+    }
+    setAffiliateCode(code)
   }, [])
 
   async function onSubmit(data: z.infer<typeof registerFormSchema>) {
@@ -162,7 +180,7 @@ export function SignUpForm({
         password: data.password,
         email: data.email || undefined,
         verification_code: verificationCode || undefined,
-        aff_code: getAffiliateCode(),
+        aff_code: resolveAffiliateCode(),
         turnstile: turnstileToken,
       })
 
