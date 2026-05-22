@@ -29,6 +29,7 @@ import {
   Command,
   Radio,
   FlaskConical,
+  Home,
   MessageSquare,
   CreditCard,
   ListTodo,
@@ -55,6 +56,11 @@ export function useSidebarData(): SidebarData {
         id: 'chat',
         title: t('Chat'),
         items: [
+          {
+            title: t('Home'),
+            url: '/',
+            icon: Home,
+          },
           {
             title: t('ccapi Chat'),
             url: '/chat',
