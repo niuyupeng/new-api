@@ -63,6 +63,20 @@ function requireAnyToken(relativeFile, tokens, label) {
   }
 }
 
+function forbidTokens(relativeFile, tokens, options = {}) {
+  const absoluteFile = path.join(root, relativeFile)
+  if (options.optional && !fs.existsSync(absoluteFile)) {
+    return
+  }
+
+  const text = read(relativeFile)
+  for (const token of tokens) {
+    if (text.includes(token)) {
+      failures.push(`${relativeFile}: forbidden legacy token "${token}"`)
+    }
+  }
+}
+
 const requiredRoutes = [
   'src/routes/(auth)/sign-in.tsx',
   'src/routes/_authenticated/chat/index.tsx',
@@ -182,6 +196,14 @@ requireTokens('src/features/docs/index.tsx', [
   'CC Switch',
   'sk-your-api-key',
 ])
+
+forbidTokens('index.html', ['notice-enhancer.js', 'ccapi-home-cover'])
+forbidTokens(
+  'dist/index.html',
+  ['notice-enhancer.js', 'ccapi-home-cover'],
+  { optional: true }
+)
+forbidTokens('src/features/home/index.tsx', ['UNIFIED MODEL ACCESS'])
 
 if (failures.length > 0) {
   console.error('ccapi regression guard failed:')

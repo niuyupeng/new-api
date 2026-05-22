@@ -16,6 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '@/stores/auth-store'
 import { Markdown } from '@/components/ui/markdown'
@@ -38,6 +39,24 @@ export function Home() {
   const { auth } = useAuthStore()
   const isAuthenticated = !!auth.user
   const { content, isLoaded, isUrl } = useHomePageContent()
+
+  useEffect(() => {
+    const removeLegacyHomeOverlay = () => {
+      document.body.classList.remove('ccapi-home-active')
+      document.getElementById('ccapi-home-cover')?.remove()
+    }
+
+    removeLegacyHomeOverlay()
+
+    const observer = new MutationObserver(removeLegacyHomeOverlay)
+    observer.observe(document.body, {
+      attributeFilter: ['class'],
+      attributes: true,
+      childList: true,
+    })
+
+    return () => observer.disconnect()
+  }, [])
 
   if (!isLoaded) {
     return (
