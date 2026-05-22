@@ -17,11 +17,11 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { useTranslation } from 'react-i18next'
-import { Separator } from '@/components/ui/separator'
 import {
   getCcapiDisplayName,
   getCcapiLogoForDarkSurface,
 } from '@/lib/ccapi-brand'
+import { Separator } from '@/components/ui/separator'
 import { getGatewayFeatures } from '../constants'
 
 interface GatewayCardProps {
@@ -36,7 +36,7 @@ export function GatewayCard({ logo, systemName }: GatewayCardProps) {
   const { t } = useTranslation()
   const features = getGatewayFeatures(t)
   const displayName = getCcapiDisplayName(systemName)
-  const displayLogo = getCcapiLogoForDarkSurface(logo)
+  const displayLogo = getCcapiLogoForDarkSurface(logo, { forceBrand: true })
 
   return (
     <div className='glass-3 group border-border/50 dark:border-border/20 relative overflow-hidden rounded-4xl border p-10 shadow-2xl transition-all duration-500 sm:p-12 dark:shadow-[0_25px_80px_-15px_rgba(0,0,0,0.4)]'>

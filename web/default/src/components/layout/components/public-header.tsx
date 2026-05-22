@@ -82,7 +82,9 @@ export function PublicHeader(props: PublicHeaderProps) {
   const user = auth.user
   const isAuthenticated = !!user
   const displaySiteName = customSiteName || getCcapiDisplayName(systemName)
-  const displayLogo = getCcapiLogoForDarkSurface(systemLogo)
+  const displayLogo = getCcapiLogoForDarkSurface(systemLogo, {
+    forceBrand: !customLogo,
+  })
   const links = navLinks.length > 0 ? navLinks : dynamicLinks
 
   useEffect(() => {
@@ -135,7 +137,7 @@ export function PublicHeader(props: PublicHeaderProps) {
                   <HeaderLogo
                     src={displayLogo}
                     loading={loading}
-                    logoLoaded={logoLoaded}
+                    logoLoaded={logoLoaded || displayLogo !== systemLogo}
                     className='size-full rounded-lg object-contain'
                   />
                 )}

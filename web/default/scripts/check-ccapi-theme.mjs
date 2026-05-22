@@ -43,7 +43,8 @@ const requiredTokens = {
   'src/features/chat-console/index.tsx': [
     'bg-background',
     'text-foreground',
-    'getCcapiLogoForDarkSurface',
+    'getCcapiLogoForLightSurface',
+    'forceBrand: true',
     '/wallet#wallet-add-funds',
     '/playground',
     '/redemption-codes',
@@ -69,6 +70,7 @@ const requiredTokens = {
   ],
   'src/components/layout/components/public-header.tsx': [
     'getCcapiLogoForDarkSurface',
+    'forceBrand: !customLogo',
     'HeaderLogo',
   ],
   'src/components/layout/components/system-brand.tsx': [

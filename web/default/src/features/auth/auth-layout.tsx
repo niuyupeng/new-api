@@ -33,7 +33,7 @@ export function AuthLayout({ children }: AuthLayoutProps) {
   const { t } = useTranslation()
   const { systemName, logo, loading } = useSystemConfig()
   const brandLabel = getCcapiDisplayName(systemName)
-  const brandLogo = getCcapiLogoForDarkSurface(logo)
+  const brandLogo = getCcapiLogoForDarkSurface(logo, { forceBrand: true })
 
   return (
     <div className='ccapi-auth-shell bg-background text-foreground relative grid min-h-svh max-w-none overflow-hidden lg:grid-cols-[0.95fr_1.05fr]'>

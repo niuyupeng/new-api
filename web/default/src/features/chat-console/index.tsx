@@ -36,7 +36,7 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import {
   getCcapiDisplayName,
-  getCcapiLogoForDarkSurface,
+  getCcapiLogoForLightSurface,
 } from '@/lib/ccapi-brand'
 import { formatQuota } from '@/lib/format'
 import { ROLE } from '@/lib/roles'
@@ -1060,7 +1060,7 @@ export function ChatConsole(props: ChatConsoleProps) {
     topupInfo?.topup_link?.trim() || '/wallet#wallet-add-funds'
   const isPurchaseCodeExternal = /^https?:\/\//i.test(purchaseCodeHref)
   const displayName = getCcapiDisplayName(systemName)
-  const displayLogo = getCcapiLogoForDarkSurface(logo)
+  const displayLogo = getCcapiLogoForLightSurface(logo, { forceBrand: true })
   const isAdmin = (user?.role ?? 0) >= ROLE.ADMIN
   const accountLinks = useMemo<ChatAccountLink[]>(
     () => [
