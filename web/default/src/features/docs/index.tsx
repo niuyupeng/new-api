@@ -217,7 +217,7 @@ function CodeBlock(props: CodeExample) {
           复制
         </Button>
       </div>
-      <pre className='max-w-full overflow-x-auto rounded-md bg-zinc-950 p-3 text-xs leading-6 text-zinc-100 sm:p-4'>
+      <pre className='ccapi-code-block max-w-full overflow-x-auto rounded-md border p-3 text-xs leading-6 sm:p-4'>
         <code className='block w-max min-w-full'>{props.code}</code>
       </pre>
     </article>
@@ -277,7 +277,7 @@ export function ApiDocs() {
                   <Terminal className='size-4 text-orange-400' />
                   OpenAI 兼容地址
                 </div>
-                <div className='rounded-md bg-zinc-950 p-3 font-mono text-sm break-all text-zinc-100'>
+                <div className='ccapi-code-block rounded-md border p-3 font-mono text-sm break-all'>
                   {openAiBaseUrl}
                 </div>
                 <Button
@@ -296,7 +296,7 @@ export function ApiDocs() {
                   <Bot className='size-4 text-orange-400' />
                   Claude / Anthropic 地址
                 </div>
-                <div className='rounded-md bg-zinc-950 p-3 font-mono text-sm break-all text-zinc-100'>
+                <div className='ccapi-code-block rounded-md border p-3 font-mono text-sm break-all'>
                   {claudeBaseUrl}
                 </div>
                 <Button

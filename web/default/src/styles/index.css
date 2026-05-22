@@ -118,6 +118,16 @@ For commercial licensing, please contact support@quantumnous.com
   max-width: 100%;
 }
 
+.ccapi-code-block {
+  border-color: var(--border);
+  background: color-mix(in oklch, var(--card) 72%, var(--foreground));
+  color: var(--card-foreground);
+}
+
+.dark .ccapi-code-block {
+  background: color-mix(in oklch, var(--background) 82%, var(--foreground));
+}
+
 @media (max-width: 640px) {
   .ccapi-docs-page pre {
     font-size: 0.72rem;

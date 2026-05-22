@@ -3,15 +3,19 @@ import { useQuery } from '@tanstack/react-query'
 import {
   Activity,
   AlertCircle,
+  Box,
   CheckCircle2,
   Copy,
   CreditCard,
   Download,
   Eraser,
   FileJson,
+  FlaskConical,
   Image as ImageIcon,
   KeyRound,
+  LayoutDashboard,
   Loader2,
+  ListTodo,
   Menu,
   MessageSquare,
   Pencil,
@@ -21,15 +25,23 @@ import {
   ReceiptText,
   Search,
   Send,
+  Settings,
   Square,
   Ticket,
   Trash2,
+  Users,
   WalletCards,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
+import {
+  getCcapiDisplayName,
+  getCcapiLogoForDarkSurface,
+} from '@/lib/ccapi-brand'
 import { formatQuota } from '@/lib/format'
+import { ROLE } from '@/lib/roles'
 import { cn } from '@/lib/utils'
+import { useSystemConfig } from '@/hooks/use-system-config'
 import { Button } from '@/components/ui/button'
 import {
   Sheet,
@@ -152,10 +164,11 @@ const IMAGE_MODEL_PRESETS = [
 ] as const
 
 const CHAT_NAV_LINKS = [
-  { href: '/', labelKey: 'Home' },
-  { href: '/pricing', labelKey: 'Pricing' },
-  { href: '/docs', labelKey: 'Docs' },
-  { href: '/dashboard/overview', labelKey: 'Console' },
+  { href: '/', labelKey: '首页' },
+  { href: '/pricing', labelKey: '模型广场' },
+  { href: '/docs', labelKey: '文档' },
+  { href: '/dashboard/overview', labelKey: '控制台首页' },
+  { href: '/about', labelKey: '关于' },
 ] as const
 
 type ChatAccountLink = {
@@ -163,6 +176,7 @@ type ChatAccountLink = {
   label: string
   icon: React.ComponentType<{ className?: string }>
   external?: boolean
+  adminOnly?: boolean
 }
 
 function createId(prefix: string): string {
@@ -436,6 +450,7 @@ function buildMessages(messages: ChatConsoleMessage[]) {
 
 export function ChatConsole(props: ChatConsoleProps) {
   const { t } = useTranslation()
+  const { systemName, logo } = useSystemConfig()
   const initialMode = props.initialMode ?? 'chat'
   const stopRef = useRef<(() => void) | null>(null)
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
@@ -1044,6 +1059,9 @@ export function ChatConsole(props: ChatConsoleProps) {
   const purchaseCodeHref =
     topupInfo?.topup_link?.trim() || '/wallet#wallet-add-funds'
   const isPurchaseCodeExternal = /^https?:\/\//i.test(purchaseCodeHref)
+  const displayName = getCcapiDisplayName(systemName)
+  const displayLogo = getCcapiLogoForDarkSurface(logo)
+  const isAdmin = (user?.role ?? 0) >= ROLE.ADMIN
   const accountLinks = useMemo<ChatAccountLink[]>(
     () => [
       {
@@ -1070,19 +1088,98 @@ export function ChatConsole(props: ChatConsoleProps) {
     ],
     [isPurchaseCodeExternal, purchaseCodeHref, t]
   )
+  const consoleLinks = useMemo<ChatAccountLink[]>(
+    () =>
+      [
+        {
+          href: '/dashboard/overview',
+          label: t('Overview'),
+          icon: Activity,
+        },
+        {
+          href: '/dashboard/models',
+          label: t('Dashboard'),
+          icon: LayoutDashboard,
+        },
+        {
+          href: '/playground',
+          label: t('Playground'),
+          icon: FlaskConical,
+        },
+        {
+          href: '/keys',
+          label: t('API Keys'),
+          icon: KeyRound,
+        },
+        {
+          href: '/usage-logs/common',
+          label: t('Usage Logs'),
+          icon: ReceiptText,
+        },
+        {
+          href: '/usage-logs/task',
+          label: t('Task Logs'),
+          icon: ListTodo,
+        },
+        {
+          href: '/channels',
+          label: t('Channels'),
+          icon: Radio,
+          adminOnly: true,
+        },
+        {
+          href: '/models/metadata',
+          label: t('Models'),
+          icon: Box,
+          adminOnly: true,
+        },
+        {
+          href: '/users',
+          label: t('Users'),
+          icon: Users,
+          adminOnly: true,
+        },
+        {
+          href: '/redemption-codes',
+          label: t('Redemption Codes'),
+          icon: Ticket,
+          adminOnly: true,
+        },
+        {
+          href: '/subscriptions',
+          label: t('Subscription Management'),
+          icon: CreditCard,
+          adminOnly: true,
+        },
+        {
+          href: '/system-settings/site',
+          label: t('System Settings'),
+          icon: Settings,
+          adminOnly: true,
+        },
+      ].filter((link) => !link.adminOnly || isAdmin),
+    [isAdmin, t]
+  )
 
   return (
     <main className='bg-background text-foreground selection:text-foreground h-dvh overflow-hidden selection:bg-orange-400/25'>
       <div className='grid h-dvh grid-cols-1 lg:grid-cols-[268px_minmax(0,1fr)]'>
         <aside className='border-border bg-card text-foreground hidden h-dvh flex-col shadow-[8px_0_40px_rgba(61,37,20,0.05)] lg:flex lg:border-r'>
           <div className='flex items-center justify-between gap-3 px-4 pt-4 pb-3'>
-            <div>
-              <h1 className='text-foreground text-[21px] font-semibold tracking-tight'>
-                ccapi
-              </h1>
-              <p className='text-muted-foreground text-xs font-medium'>
-                {t('Chat and images')}
-              </p>
+            <div className='flex min-w-0 items-center gap-2.5'>
+              <img
+                src={displayLogo}
+                alt={t('Logo')}
+                className='size-8 shrink-0 rounded-xl object-contain'
+              />
+              <div className='min-w-0'>
+                <h1 className='text-foreground text-[21px] font-semibold tracking-tight'>
+                  {displayName}
+                </h1>
+                <p className='text-muted-foreground text-xs font-medium'>
+                  {t('Chat and images')}
+                </p>
+              </div>
             </div>
             <Button
               size='icon'
@@ -1127,6 +1224,13 @@ export function ChatConsole(props: ChatConsoleProps) {
               {t('Personal')}
             </p>
             <AccountLinks links={accountLinks} />
+          </div>
+
+          <div className='px-4 pb-3'>
+            <p className='text-muted-foreground mb-2 px-1 text-[11px] font-medium tracking-wide uppercase'>
+              {t('Console')}
+            </p>
+            <AccountLinks links={consoleLinks} />
           </div>
 
           <div className='flex-1 space-y-1 overflow-y-auto px-2 pb-4'>
@@ -1224,12 +1328,21 @@ export function ChatConsole(props: ChatConsoleProps) {
                   className='border-border bg-card text-foreground w-[300px] p-0 sm:max-w-[320px]'
                 >
                   <SheetHeader className='border-border border-b p-4 text-left'>
-                    <SheetTitle className='text-foreground text-xl font-semibold'>
-                      ccapi
-                    </SheetTitle>
-                    <SheetDescription className='text-muted-foreground text-xs'>
-                      {t('Chat and images')}
-                    </SheetDescription>
+                    <div className='flex min-w-0 items-center gap-2.5'>
+                      <img
+                        src={displayLogo}
+                        alt={t('Logo')}
+                        className='size-8 shrink-0 rounded-xl object-contain'
+                      />
+                      <div className='min-w-0'>
+                        <SheetTitle className='text-foreground truncate text-xl font-semibold'>
+                          {displayName}
+                        </SheetTitle>
+                        <SheetDescription className='text-muted-foreground text-xs'>
+                          {t('Chat and images')}
+                        </SheetDescription>
+                      </div>
+                    </div>
                   </SheetHeader>
                   <div className='flex flex-1 flex-col overflow-hidden'>
                     <div className='p-3'>
@@ -1278,6 +1391,15 @@ export function ChatConsole(props: ChatConsoleProps) {
                       </p>
                       <AccountLinks
                         links={accountLinks}
+                        onNavigate={() => setIsMobileMenuOpen(false)}
+                      />
+                    </div>
+                    <div className='px-3 pb-3'>
+                      <p className='text-muted-foreground mb-2 px-1 text-[11px] font-medium tracking-wide uppercase'>
+                        {t('Console')}
+                      </p>
+                      <AccountLinks
+                        links={consoleLinks}
                         onNavigate={() => setIsMobileMenuOpen(false)}
                       />
                     </div>
@@ -1867,7 +1989,7 @@ function ModeButton(props: {
       className={cn(
         'border-border text-muted-foreground hover:bg-muted hover:text-foreground h-9 rounded-full bg-transparent px-3 transition',
         props.active &&
-          'border-orange-400 bg-orange-400 text-zinc-950 shadow-sm hover:bg-orange-300 hover:text-zinc-950'
+          'border-orange-400 bg-orange-400 text-black shadow-sm hover:bg-orange-300 hover:text-black'
       )}
     >
       <Icon className='size-4' />
