@@ -27,6 +27,7 @@ import type {
   TopupInfo,
   PresetAmount,
   CreemProduct,
+  InviteDiscountInfo,
   PaymentMethod,
   WaffoPayMethod,
 } from '../types'
@@ -161,6 +162,28 @@ function parseDiscountMap(data: unknown): Record<number, number> {
   )
 }
 
+function parseInviteDiscountInfo(
+  data: unknown
+): InviteDiscountInfo | undefined {
+  if (!data || typeof data !== 'object' || Array.isArray(data)) {
+    return undefined
+  }
+
+  const item = data as Record<string, unknown>
+  return {
+    bound: Boolean(item.bound),
+    eligible: Boolean(item.eligible),
+    discount_rate: Number(item.discount_rate) || 1,
+    discount_percent: Number(item.discount_percent) || 0,
+    discount_type:
+      typeof item.discount_type === 'string' ? item.discount_type : undefined,
+    invite_code: typeof item.invite_code === 'string' ? item.invite_code : '',
+    first_topup_used: Boolean(item.first_topup_used),
+    has_pending: Boolean(item.has_pending),
+    min_amount: Number(item.min_amount) || 0,
+  }
+}
+
 export function useTopupInfo() {
   const [topupInfo, setTopupInfo] = useState<TopupInfo | null>(null)
   const [presetAmounts, setPresetAmounts] = useState<PresetAmount[]>([])
@@ -186,6 +209,7 @@ export function useTopupInfo() {
         ),
         amount_options: parseAmountOptions(response.data.amount_options),
         discount: parseDiscountMap(response.data.discount),
+        invite_discount: parseInviteDiscountInfo(response.data.invite_discount),
         creem_products: parseCreemProducts(response.data.creem_products),
         waffo_pay_methods: parseWaffoPayMethods(
           response.data.waffo_pay_methods

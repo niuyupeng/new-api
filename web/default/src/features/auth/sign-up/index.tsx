@@ -31,16 +31,19 @@ export function SignUp() {
     <AuthLayout>
       <div className='w-full space-y-8'>
         <div className='space-y-2'>
-          <h2 className='text-center text-2xl font-semibold tracking-tight sm:text-left'>
+          <p className='text-xs font-black tracking-[0.18em] text-orange-400 uppercase'>
             {t('Create an account')}
+          </p>
+          <h2 className='text-center text-3xl font-black tracking-tight sm:text-left'>
+            {t('先领一张接入票')}
           </h2>
           <p className='text-muted-foreground text-left text-sm sm:text-base'>
-            {t('Already have an account?')}{' '}
+            {t('已有账号？')}{' '}
             <Link
               to='/sign-in'
-              className='hover:text-primary font-medium underline underline-offset-4'
+              className='font-bold text-orange-400 underline underline-offset-4 hover:text-orange-300'
             >
-              {t('Sign in')}
+              {t('直接登录')}
             </Link>
             .
           </p>

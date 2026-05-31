@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"os"
 	"strings"
 
 	"github.com/QuantumNous/new-api/common"
@@ -37,6 +38,26 @@ func TestStatus(c *gin.Context) {
 		"http_stats": httpStats,
 	})
 	return
+}
+
+func GetAPIHealth(c *gin.Context) {
+	baseURL := strings.TrimSpace(os.Getenv("NEWAPI_BASE_URL"))
+	apiKey := strings.TrimSpace(os.Getenv("NEWAPI_API_KEY"))
+
+	dbOK := model.PingDB() == nil
+	modelsReachable := dbOK
+	message := "New API service is reachable"
+	if !dbOK {
+		message = "数据库连接失败"
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"ok":                dbOK,
+		"baseUrlConfigured": baseURL != "",
+		"apiKeyConfigured":  apiKey != "",
+		"modelsReachable":   modelsReachable,
+		"message":           message,
+	})
 }
 
 func GetStatus(c *gin.Context) {
@@ -87,6 +108,8 @@ func GetStatus(c *gin.Context) {
 		"chats":                         setting.Chats,
 		"demo_site_enabled":             operation_setting.DemoSiteEnabled,
 		"self_use_mode_enabled":         operation_setting.SelfUseModeEnabled,
+		"register_enabled":              common.RegisterEnabled,
+		"password_register_enabled":     common.PasswordRegisterEnabled,
 		"default_use_auto_group":        setting.DefaultUseAutoGroup,
 
 		"usd_exchange_rate": operation_setting.USDExchangeRate,

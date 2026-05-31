@@ -61,6 +61,15 @@ const dashboardRegistry = createSectionRegistry<
 
 export const DASHBOARD_SECTION_IDS = dashboardRegistry.sectionIds
 export const DASHBOARD_DEFAULT_SECTION = dashboardRegistry.defaultSection
+export const DASHBOARD_DEFAULT_PATH = `/dashboard/${DASHBOARD_DEFAULT_SECTION}`
+
+export function normalizeDashboardRedirect(target?: string): string {
+  const cleanTarget = target?.trim()
+  if (!cleanTarget || cleanTarget === '/dashboard' || cleanTarget === '/dashboard/') {
+    return DASHBOARD_DEFAULT_PATH
+  }
+  return cleanTarget
+}
 
 export function getDashboardSectionNavItems(
   t: TFunction,

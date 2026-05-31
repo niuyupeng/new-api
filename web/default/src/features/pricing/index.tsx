@@ -1,25 +1,8 @@
-/*
-Copyright (C) 2023-2026 QuantumNous
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <https://www.gnu.org/licenses/>.
-
-For commercial licensing, please contact support@quantumnous.com
-*/
 import { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { PublicLayout } from '@/components/layout'
 import { PageTransition } from '@/components/page-transition'
+import { ccapiPublicNavLinks } from '@/features/ccapi/public-nav'
 import {
   LoadingSkeleton,
   EmptyState,
@@ -146,8 +129,13 @@ export function Pricing() {
 
   if (isLoading) {
     return (
-      <PublicLayout showMainContainer={false}>
-        <div className='mx-auto w-full max-w-[1800px] px-3 pt-16 pb-8 sm:px-6 sm:pt-20 sm:pb-10 xl:px-8'>
+      <PublicLayout
+        showMainContainer={false}
+        navLinks={ccapiPublicNavLinks}
+        siteName='ccapi'
+        headerProps={{ className: 'ccapi-public-header' }}
+      >
+        <div className='bg-background min-h-svh px-3 pt-24 pb-8 sm:px-6 sm:pt-28 sm:pb-10 xl:px-8'>
           <LoadingSkeleton viewMode={viewMode} />
         </div>
       </PublicLayout>
@@ -155,53 +143,64 @@ export function Pricing() {
   }
 
   return (
-    <PublicLayout showMainContainer={false}>
-      <div className='relative'>
-        <div
-          aria-hidden
-          className='pointer-events-none absolute inset-x-0 top-0 h-[600px] opacity-20 dark:opacity-[0.10]'
-          style={{
-            background: [
-              'radial-gradient(ellipse 60% 50% at 20% 20%, oklch(0.72 0.18 250 / 80%) 0%, transparent 70%)',
-              'radial-gradient(ellipse 50% 40% at 80% 15%, oklch(0.65 0.15 200 / 60%) 0%, transparent 70%)',
-              'radial-gradient(ellipse 40% 35% at 50% 70%, oklch(0.70 0.12 280 / 40%) 0%, transparent 70%)',
-            ].join(', '),
-            maskImage:
-              'linear-gradient(to bottom, black 40%, transparent 100%)',
-            WebkitMaskImage:
-              'linear-gradient(to bottom, black 40%, transparent 100%)',
-          }}
-        />
-        <PageTransition className='relative mx-auto w-full max-w-[1800px] px-3 pt-16 pb-8 sm:px-6 sm:pt-20 sm:pb-10 xl:px-8'>
-          <header className='mx-auto mb-5 max-w-3xl pt-5 text-center sm:mb-10 sm:pt-10'>
-            <p className='text-muted-foreground mb-3 text-xs font-medium tracking-widest uppercase'>
-              {t('Models Directory')}
-            </p>
-            <h1 className='text-[clamp(2rem,5.5vw,3.5rem)] leading-[1.15] font-bold tracking-tight'>
-              {t('Model Square')}
-            </h1>
-            <p className='text-muted-foreground/80 mt-3 text-sm sm:mt-4 sm:text-base'>
-              {t('This site currently has {{count}} models enabled', {
-                count: models?.length || 0,
-              })}
-            </p>
-            <p className='text-muted-foreground/60 mx-auto mt-2 max-w-2xl text-xs leading-relaxed sm:text-sm'>
-              {t(
-                'Discover curated AI models, compare pricing and capabilities, and choose the right model for every scenario.'
-              )}
-            </p>
-            <SearchBar
-              value={searchInput}
-              onChange={setSearchInput}
-              onClear={clearSearch}
-              placeholder={t(
-                'Search model name, provider, endpoint, or tag...'
-              )}
-              className='mx-auto mt-4 max-w-2xl sm:mt-6'
-            />
+    <PublicLayout
+      showMainContainer={false}
+      navLinks={ccapiPublicNavLinks}
+      siteName='ccapi'
+      headerProps={{ className: 'ccapi-public-header' }}
+    >
+      <div className='ccapi-pricing-page bg-background text-foreground min-h-svh'>
+        <PageTransition className='mx-auto w-full max-w-[1800px] px-3 pt-24 pb-8 sm:px-6 sm:pt-28 sm:pb-10 xl:px-8'>
+          <header className='mx-auto mb-6 grid max-w-6xl gap-5 pt-4 lg:grid-cols-[1fr_0.72fr] lg:items-end'>
+            <div>
+              <p className='mb-3 text-sm font-bold text-orange-400'>
+                {t('模型价格表')}
+              </p>
+              <h1 className='text-foreground max-w-3xl text-3xl leading-tight font-black tracking-tight sm:text-4xl md:text-5xl'>
+                {t('模型价格')}
+              </h1>
+              <p className='text-muted-foreground mt-4 max-w-2xl text-sm leading-7 sm:text-base'>
+                {t(
+                  '当前可用 {{count}} 个模型。搜索模型名、供应商、端点或标签，快速比较输入价、输出价、缓存价和按次价格。',
+                  {
+                    count: models?.length || 0,
+                  }
+                )}
+              </p>
+            </div>
+            <div className='ccapi-pricing-search-panel border-border bg-card min-w-0 rounded-xl border p-4 shadow-sm'>
+              <div className='text-foreground mb-3 text-sm font-bold'>
+                {t('快速搜索')}
+              </div>
+              <SearchBar
+                value={searchInput}
+                onChange={setSearchInput}
+                onClear={clearSearch}
+                placeholder={t(
+                  'Search model name, provider, endpoint, or tag...'
+                )}
+                className='ccapi-pricing-search'
+              />
+              <div className='mt-4 grid grid-cols-3 gap-2 text-center text-xs'>
+                <div className='ccapi-pricing-stat border-border bg-background rounded-md border px-2 py-3'>
+                  <div className='text-foreground font-black'>/1M</div>
+                  <div className='text-muted-foreground mt-1'>{t('Token')}</div>
+                </div>
+                <div className='ccapi-pricing-stat border-border bg-background rounded-md border px-2 py-3'>
+                  <div className='text-foreground font-black'>CNY</div>
+                  <div className='text-muted-foreground mt-1'>
+                    {t('Recharge')}
+                  </div>
+                </div>
+                <div className='ccapi-pricing-stat border-border bg-background rounded-md border px-2 py-3'>
+                  <div className='text-foreground font-black'>API</div>
+                  <div className='text-muted-foreground mt-1'>{t('Ready')}</div>
+                </div>
+              </div>
+            </div>
           </header>
 
-          <div className='grid gap-4 xl:grid-cols-[330px_minmax(0,1fr)]'>
+          <div className='grid gap-4 xl:grid-cols-[330px_minmax(0,1fr)] 2xl:grid-cols-[330px_minmax(0,1fr)]'>
             <PricingSidebar
               quotaTypeFilter={quotaTypeFilter}
               endpointTypeFilter={endpointTypeFilter}
@@ -220,7 +219,7 @@ export function Pricing() {
               models={models || []}
               hasActiveFilters={hasActiveFilters}
               onClearFilters={clearFilters}
-              className='hover-scrollbar sticky top-4 hidden max-h-[calc(100dvh-2rem)] self-start overflow-y-auto xl:block'
+              className='sticky top-20 hidden max-h-[calc(100vh-6rem)] overflow-y-auto xl:block'
             />
 
             <main className='min-w-0 space-y-4'>

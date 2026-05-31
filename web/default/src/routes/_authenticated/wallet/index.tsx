@@ -21,7 +21,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { Wallet } from '@/features/wallet'
 
 const walletSearchSchema = z.object({
-  show_history: z.boolean().optional(),
+  show_history: z.coerce.boolean().optional(),
 })
 
 export const Route = createFileRoute('/_authenticated/wallet/')({

@@ -32,21 +32,25 @@ export function SignIn() {
     <AuthLayout>
       <div className='w-full space-y-8'>
         <div className='space-y-2'>
-          <h2 className='text-center text-2xl font-semibold tracking-tight sm:text-left'>
+          <p className='text-xs font-black tracking-[0.18em] text-orange-400 uppercase'>
             {t('Sign in')}
+          </p>
+          <h2 className='text-center text-3xl font-black tracking-tight sm:text-left'>
+            {t('回到你的 API 控制台')}
           </h2>
-          {!status?.self_use_mode_enabled && (
-            <p className='text-muted-foreground text-left text-sm sm:text-base'>
-              {t("Don't have an account?")}{' '}
-              <Link
-                to='/sign-up'
-                className='hover:text-primary font-medium underline underline-offset-4'
-              >
-                {t('Sign up')}
-              </Link>
-              .
-            </p>
-          )}
+          {!status?.self_use_mode_enabled &&
+            status?.register_enabled !== false && (
+              <p className='text-muted-foreground text-left text-sm sm:text-base'>
+                {t("Don't have an account?")}{' '}
+                <Link
+                  to='/sign-up'
+                  className='font-bold text-orange-400 underline underline-offset-4 hover:text-orange-300'
+                >
+                  {t('Sign up now')}
+                </Link>
+                .
+              </p>
+            )}
         </div>
 
         <UserAuthForm redirectTo={redirect} />

@@ -30,7 +30,6 @@ import { TransferDialog } from './components/dialogs/transfer-dialog'
 import { RechargeFormCard } from './components/recharge-form-card'
 import { SubscriptionPlansCard } from './components/subscription-plans-card'
 import { WalletStatsCard } from './components/wallet-stats-card'
-import { DEFAULT_DISCOUNT_RATE } from './constants'
 import {
   useTopupInfo,
   usePayment,
@@ -42,6 +41,7 @@ import {
 } from './hooks'
 import {
   getDefaultPaymentType,
+  getEffectiveTopupDiscount,
   getMinTopupAmount,
   isWaffoPancakePayment,
 } from './lib'
@@ -50,6 +50,7 @@ import type {
   PaymentMethod,
   PresetAmount,
   CreemProduct,
+  WaffoPayMethod,
 } from './types'
 
 interface WalletProps {
@@ -234,8 +235,11 @@ export function Wallet(props: WalletProps) {
     }
   }
 
-  const handleWaffoMethodSelect = async (_method: unknown, index: number) => {
-    const loadingKey = `waffo-${index}`
+  const handleWaffoMethodSelect = async (
+    _method: WaffoPayMethod | null,
+    index?: number
+  ) => {
+    const loadingKey = index == null ? 'waffo-auto' : `waffo-${index}`
     setPaymentLoading(loadingKey)
 
     try {
@@ -245,10 +249,10 @@ export function Wallet(props: WalletProps) {
     }
   }
 
-  // Get discount rate for current topup amount
-  const getDiscountRate = useCallback(() => {
-    return topupInfo?.discount?.[topupAmount] || DEFAULT_DISCOUNT_RATE
-  }, [topupInfo, topupAmount])
+  const currentDiscount = useMemo(
+    () => getEffectiveTopupDiscount(topupInfo, topupAmount),
+    [topupInfo, topupAmount]
+  )
 
   const handleSubscriptionAvailabilityChange = useCallback(
     (available: boolean) => {
@@ -265,7 +269,7 @@ export function Wallet(props: WalletProps) {
           {t('Manage your balance and payment methods')}
         </SectionPageLayout.Description>
         <SectionPageLayout.Content>
-          <div className='mx-auto flex w-full max-w-7xl flex-col gap-4 sm:gap-5'>
+          <div className='ccapi-wallet-page mx-auto flex w-full max-w-7xl flex-col gap-4 sm:gap-5'>
             <WalletStatsCard user={user} loading={userLoading} />
 
             <div
@@ -337,7 +341,8 @@ export function Wallet(props: WalletProps) {
         paymentMethod={selectedPaymentMethod}
         calculating={calculating}
         processing={processing || pancakeProcessing}
-        discountRate={getDiscountRate()}
+        discountRate={currentDiscount.rate}
+        discountType={currentDiscount.type}
         usdExchangeRate={effectiveUsdExchangeRate}
       />
 

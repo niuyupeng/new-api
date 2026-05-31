@@ -20,7 +20,7 @@ import { useEffect, useMemo, useState } from 'react'
 import type { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Loader2 } from 'lucide-react'
+import { Gift, Loader2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { cn } from '@/lib/utils'
@@ -53,7 +53,19 @@ import { registerFormSchema } from '@/features/auth/constants'
 import { useAuthRedirect } from '@/features/auth/hooks/use-auth-redirect'
 import { useEmailVerification } from '@/features/auth/hooks/use-email-verification'
 import { useTurnstile } from '@/features/auth/hooks/use-turnstile'
-import { getAffiliateCode } from '@/features/auth/lib/storage'
+import {
+  getAffiliateCode,
+  saveAffiliateCode,
+} from '@/features/auth/lib/storage'
+
+function getAffiliateCodeFromUrl(): string {
+  if (typeof window === 'undefined') return ''
+  return new URLSearchParams(window.location.search).get('aff')?.trim() ?? ''
+}
+
+function resolveAffiliateCode(): string {
+  return getAffiliateCodeFromUrl() || getAffiliateCode()
+}
 
 export function SignUpForm({
   className,
@@ -66,6 +78,9 @@ export function SignUpForm({
   const [wechatCode, setWeChatCode] = useState('')
   const [isWeChatDialogOpen, setIsWeChatDialogOpen] = useState(false)
   const [isWeChatSubmitting, setIsWeChatSubmitting] = useState(false)
+  const [affiliateCode, setAffiliateCode] = useState(() =>
+    resolveAffiliateCode()
+  )
   const legalConsentErrorMessage = t('Please agree to the legal terms first')
 
   const { status } = useStatus()
@@ -130,6 +145,14 @@ export function SignUpForm({
     }
   }, [requiresLegalConsent])
 
+  useEffect(() => {
+    const code = resolveAffiliateCode()
+    if (code) {
+      saveAffiliateCode(code)
+    }
+    setAffiliateCode(code)
+  }, [])
+
   async function onSubmit(data: z.infer<typeof registerFormSchema>) {
     if (requiresLegalConsent && !agreedToLegal) {
       toast.error(legalConsentErrorMessage)
@@ -148,6 +171,8 @@ export function SignUpForm({
       }
     }
 
+    if (!validateTurnstile()) return
+
     setIsLoading(true)
     try {
       const res = await register({
@@ -155,7 +180,7 @@ export function SignUpForm({
         password: data.password,
         email: data.email || undefined,
         verification_code: verificationCode || undefined,
-        aff: getAffiliateCode(),
+        aff_code: resolveAffiliateCode(),
         turnstile: turnstileToken,
       })
 
@@ -221,6 +246,27 @@ export function SignUpForm({
         className={cn('grid gap-4', className)}
         {...props}
       >
+        {affiliateCode && (
+          <div className='border-emerald-200 bg-emerald-50/80 text-emerald-950 dark:border-emerald-900/60 dark:bg-emerald-950/30 dark:text-emerald-100 flex gap-3 rounded-lg border p-3'>
+            <div className='bg-background/80 flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-emerald-200 dark:border-emerald-900'>
+              <Gift className='h-4 w-4 text-emerald-600 dark:text-emerald-300' />
+            </div>
+            <div className='min-w-0 space-y-1'>
+              <div className='flex flex-wrap items-center gap-2 text-sm font-semibold'>
+                <span>{t('Invitation discount bound')}</span>
+                <span className='rounded border border-emerald-300 px-1.5 py-0.5 text-[11px] font-medium dark:border-emerald-700'>
+                  {t('First top-up offer')}
+                </span>
+              </div>
+              <p className='text-xs leading-5 text-emerald-700 dark:text-emerald-200'>
+                {t(
+                  'Your first top-up discount will be applied after account creation.'
+                )}
+              </p>
+            </div>
+          </div>
+        )}
+
         {/* Username Field */}
         <FormField
           control={form.control}
@@ -318,16 +364,17 @@ export function SignUpForm({
               </Button>
             </div>
 
-            {/* Turnstile */}
-            {isTurnstileEnabled && (
-              <div className='mt-2'>
-                <Turnstile
-                  siteKey={turnstileSiteKey}
-                  onVerify={setTurnstileToken}
-                />
-              </div>
-            )}
           </>
+        )}
+
+        {/* Turnstile */}
+        {isTurnstileEnabled && (
+          <div className='mt-2'>
+            <Turnstile
+              siteKey={turnstileSiteKey}
+              onVerify={setTurnstileToken}
+            />
+          </div>
         )}
 
         <LegalConsent

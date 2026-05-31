@@ -1,53 +1,38 @@
-/*
-Copyright (C) 2023-2026 QuantumNous
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <https://www.gnu.org/licenses/>.
-
-For commercial licensing, please contact support@quantumnous.com
-*/
-import { useCallback, useEffect, useState } from 'react'
-import { Link, useNavigate, useRouterState } from '@tanstack/react-router'
+import { useState, useEffect } from 'react'
+import { Link, useRouterState } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '@/stores/auth-store'
+import {
+  getCcapiDisplayName,
+  getCcapiLogoForDarkSurface,
+} from '@/lib/ccapi-brand'
 import { cn } from '@/lib/utils'
 import { useNotifications } from '@/hooks/use-notifications'
 import { useSystemConfig } from '@/hooks/use-system-config'
 import { useTopNavLinks } from '@/hooks/use-top-nav-links'
 import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog'
 import { Skeleton } from '@/components/ui/skeleton'
 import { LanguageSwitcher } from '@/components/language-switcher'
 import { NotificationButton } from '@/components/notification-button'
 import { NotificationDialog } from '@/components/notification-dialog'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ThemeSwitch } from '@/components/theme-switch'
+import { DASHBOARD_DEFAULT_PATH } from '@/features/dashboard/section-registry'
 import { defaultTopNavLinks } from '../config/top-nav.config'
 import type { TopNavLink } from '../types'
 import { HeaderLogo } from './header-logo'
 
-const AUTH_PROMPT_SECONDS = 5
+function normalizeNavPath(path: string): string {
+  const cleanPath = path.split(/[?#]/)[0] || '/'
+  if (cleanPath === '/') return cleanPath
+  return cleanPath.endsWith('/') ? cleanPath.slice(0, -1) : cleanPath
+}
 
-type AuthPromptTarget = {
-  title: string
-  href: string
+function isNavLinkActive(pathname: string, href: string): boolean {
+  const current = normalizeNavPath(pathname)
+  const target = normalizeNavPath(href)
+  if (target === '/') return current === '/'
+  return current === target || current.startsWith(`${target}/`)
 }
 
 export interface PublicHeaderProps {
@@ -80,13 +65,8 @@ export function PublicHeader(props: PublicHeaderProps) {
   } = props
 
   const { t } = useTranslation()
-  const navigate = useNavigate()
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
-  const [authPromptTarget, setAuthPromptTarget] =
-    useState<AuthPromptTarget | null>(null)
-  const [authPromptSecondsLeft, setAuthPromptSecondsLeft] =
-    useState(AUTH_PROMPT_SECONDS)
   const { auth } = useAuthStore()
   const {
     systemName,
@@ -101,8 +81,11 @@ export function PublicHeader(props: PublicHeaderProps) {
 
   const user = auth.user
   const isAuthenticated = !!user
-  const displaySiteName = customSiteName || systemName
-  const links = dynamicLinks.length > 0 ? dynamicLinks : navLinks
+  const displaySiteName = customSiteName || getCcapiDisplayName(systemName)
+  const displayLogo = getCcapiLogoForDarkSurface(systemLogo, {
+    forceBrand: !customLogo,
+  })
+  const links = navLinks.length > 0 ? navLinks : dynamicLinks
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20)
@@ -118,70 +101,14 @@ export function PublicHeader(props: PublicHeaderProps) {
     }
   }, [mobileOpen])
 
-  useEffect(() => {
-    if (!authPromptTarget) return
-
-    const intervalId = window.setInterval(() => {
-      setAuthPromptSecondsLeft((seconds) => Math.max(seconds - 1, 0))
-    }, 1000)
-
-    const timeoutId = window.setTimeout(() => {
-      const redirect = authPromptTarget.href
-      setAuthPromptTarget(null)
-      navigate({ to: '/sign-in', search: { redirect } })
-    }, AUTH_PROMPT_SECONDS * 1000)
-
-    return () => {
-      window.clearInterval(intervalId)
-      window.clearTimeout(timeoutId)
-    }
-  }, [authPromptTarget, navigate])
-
-  const closeAuthPrompt = useCallback(() => {
-    setAuthPromptTarget(null)
-    setAuthPromptSecondsLeft(AUTH_PROMPT_SECONDS)
-  }, [])
-
-  const navigateToSignIn = useCallback(() => {
-    const redirect = authPromptTarget?.href || '/'
-    setAuthPromptTarget(null)
-    navigate({ to: '/sign-in', search: { redirect } })
-  }, [authPromptTarget?.href, navigate])
-
-  const handleNavLinkClick = useCallback(
-    (
-      event: React.MouseEvent<HTMLAnchorElement>,
-      link: TopNavLink,
-      closeMobile = false
-    ) => {
-      if (link.disabled) {
-        event.preventDefault()
-        return
-      }
-
-      if (link.requiresAuth) {
-        event.preventDefault()
-        if (closeMobile) {
-          setMobileOpen(false)
-        }
-        setAuthPromptSecondsLeft(AUTH_PROMPT_SECONDS)
-        setAuthPromptTarget({
-          title: t(link.title),
-          href: link.href,
-        })
-        return
-      }
-
-      if (closeMobile) {
-        setMobileOpen(false)
-      }
-    },
-    [t]
-  )
-
   return (
     <>
-      <header className='pointer-events-none fixed inset-x-0 top-0 z-50'>
+      <header
+        className={cn(
+          'pointer-events-none fixed inset-x-0 top-0 z-50',
+          props.className
+        )}
+      >
         <div
           className={cn(
             'pointer-events-auto mx-auto transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]',
@@ -199,23 +126,23 @@ export function PublicHeader(props: PublicHeaderProps) {
             {/* Logo */}
             <Link
               to={homeUrl}
-              className='group flex shrink-0 items-center gap-2.5'
+              className='group flex min-w-0 shrink-0 items-center gap-2.5'
             >
-              <div className='flex size-7 shrink-0 items-center justify-center transition-all duration-300 group-hover:scale-105'>
+              <div className='flex size-7 shrink-0 items-center justify-center rounded-xl p-0.5 transition-all duration-300 group-hover:scale-105'>
                 {loading ? (
                   <Skeleton className='size-full rounded-lg' />
                 ) : customLogo ? (
                   customLogo
                 ) : (
                   <HeaderLogo
-                    src={systemLogo}
+                    src={displayLogo}
                     loading={loading}
-                    logoLoaded={logoLoaded}
+                    logoLoaded={logoLoaded || displayLogo !== systemLogo}
                     className='size-full rounded-lg object-contain'
                   />
                 )}
               </div>
-              <span className='text-sm font-semibold tracking-tight'>
+              <span className='max-w-28 truncate text-sm font-semibold tracking-tight sm:max-w-none'>
                 {loading ? <Skeleton className='h-4 w-16' /> : displaySiteName}
               </span>
             </Link>
@@ -223,7 +150,7 @@ export function PublicHeader(props: PublicHeaderProps) {
             {/* Desktop nav */}
             <div className='hidden items-center gap-0.5 sm:flex'>
               {links.map((link, i) => {
-                const isActive = pathname === link.href
+                const isActive = isNavLinkActive(pathname, link.href)
                 if (link.external) {
                   return (
                     <a
@@ -231,13 +158,8 @@ export function PublicHeader(props: PublicHeaderProps) {
                       href={link.href}
                       target='_blank'
                       rel='noopener noreferrer'
-                      aria-disabled={link.disabled}
-                      tabIndex={link.disabled ? -1 : undefined}
-                      onClick={(event) => handleNavLinkClick(event, link)}
-                      className={cn(
-                        'text-muted-foreground hover:text-foreground rounded-lg px-3 py-1.5 text-[13px] font-medium transition-colors duration-200',
-                        link.disabled && 'pointer-events-none opacity-50'
-                      )}
+                      data-ccapi-nav-link='true'
+                      className='text-muted-foreground hover:text-foreground rounded-lg px-3 py-1.5 text-[13px] font-medium transition-colors duration-200'
                     >
                       {t(link.title)}
                     </a>
@@ -247,14 +169,14 @@ export function PublicHeader(props: PublicHeaderProps) {
                   <Link
                     key={i}
                     to={link.href}
-                    disabled={link.disabled}
-                    onClick={(event) => handleNavLinkClick(event, link)}
+                    aria-current={isActive ? 'page' : undefined}
+                    data-ccapi-nav-link='true'
+                    data-active={isActive ? 'true' : undefined}
                     className={cn(
                       'rounded-lg px-3 py-1.5 text-[13px] font-medium transition-colors duration-200',
                       isActive
                         ? 'text-foreground'
-                        : 'text-muted-foreground hover:text-foreground',
-                      link.disabled && 'pointer-events-none opacity-50'
+                        : 'text-muted-foreground hover:text-foreground'
                     )}
                   >
                     {t(link.title)}
@@ -288,9 +210,9 @@ export function PublicHeader(props: PublicHeaderProps) {
                     <Button
                       size='sm'
                       className='h-8 rounded-lg px-3.5 text-xs font-medium'
-                      render={<Link to='/sign-in' />}
+                      asChild
                     >
-                      {t('Sign in')}
+                      <Link to='/sign-in'>{t('Sign in')}</Link>
                     </Button>
                   )}
                 </>
@@ -303,11 +225,8 @@ export function PublicHeader(props: PublicHeaderProps) {
               {showAuthButtons && !loading && isAuthenticated && (
                 <ProfileDropdown />
               )}
-              <Button
-                type='button'
-                variant='ghost'
-                size='icon'
-                className='size-9'
+              <button
+                className='hover:bg-muted/40 flex size-9 items-center justify-center rounded-lg transition-colors'
                 onClick={() => setMobileOpen((v) => !v)}
                 aria-label={t('Toggle navigation menu')}
               >
@@ -331,7 +250,7 @@ export function PublicHeader(props: PublicHeaderProps) {
                     )}
                   />
                 </div>
-              </Button>
+              </button>
             </div>
           </nav>
         </div>
@@ -346,46 +265,26 @@ export function PublicHeader(props: PublicHeaderProps) {
             : 'pointer-events-none opacity-0'
         )}
       >
-        <div className='flex h-full flex-col justify-between px-8 pt-20 pb-10'>
+        <div className='flex h-full flex-col justify-between px-5 pt-20 pb-[calc(2rem+env(safe-area-inset-bottom))] sm:px-8'>
           <nav className='flex flex-col gap-1'>
             {links.map((link, i) => {
-              const isActive = pathname === link.href
-              const linkClassName = cn(
-                'flex items-center gap-3 py-3 text-base font-medium tracking-tight transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]',
-                mobileOpen
-                  ? 'translate-y-0 opacity-100'
-                  : 'translate-y-4 opacity-0',
-                isActive ? 'text-foreground' : 'text-muted-foreground',
-                link.disabled && 'pointer-events-none opacity-50'
-              )
-              const transitionStyle = {
-                transitionDelay: mobileOpen ? `${100 + i * 50}ms` : '0ms',
-              }
-              if (link.external) {
-                return (
-                  <a
-                    key={i}
-                    href={link.href}
-                    target='_blank'
-                    rel='noopener noreferrer'
-                    aria-disabled={link.disabled}
-                    tabIndex={link.disabled ? -1 : undefined}
-                    onClick={(event) => handleNavLinkClick(event, link, true)}
-                    className={linkClassName}
-                    style={transitionStyle}
-                  >
-                    {t(link.title)}
-                  </a>
-                )
-              }
+              const isActive = isNavLinkActive(pathname, link.href)
               return (
                 <Link
                   key={i}
                   to={link.href}
-                  disabled={link.disabled}
-                  onClick={(event) => handleNavLinkClick(event, link, true)}
-                  className={linkClassName}
-                  style={transitionStyle}
+                  aria-current={isActive ? 'page' : undefined}
+                  onClick={() => setMobileOpen(false)}
+                  className={cn(
+                    'flex items-center gap-3 py-3 text-base font-medium tracking-tight transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]',
+                    mobileOpen
+                      ? 'translate-y-0 opacity-100'
+                      : 'translate-y-4 opacity-0',
+                    isActive ? 'text-foreground' : 'text-muted-foreground'
+                  )}
+                  style={{
+                    transitionDelay: mobileOpen ? `${100 + i * 50}ms` : '0ms',
+                  }}
                 >
                   {t(link.title)}
                 </Link>
@@ -404,7 +303,7 @@ export function PublicHeader(props: PublicHeaderProps) {
           >
             {showAuthButtons && (
               <Link
-                to={isAuthenticated ? '/dashboard' : '/sign-in'}
+                to={isAuthenticated ? DASHBOARD_DEFAULT_PATH : '/sign-in'}
                 onClick={() => setMobileOpen(false)}
                 className='bg-foreground text-background inline-flex h-10 items-center justify-center rounded-lg text-sm font-medium transition-opacity hover:opacity-90 active:opacity-80'
               >
@@ -414,37 +313,6 @@ export function PublicHeader(props: PublicHeaderProps) {
           </div>
         </div>
       </div>
-
-      <Dialog
-        open={!!authPromptTarget}
-        onOpenChange={(open) => {
-          if (!open) {
-            closeAuthPrompt()
-          }
-        }}
-      >
-        <DialogContent className='sm:max-w-md'>
-          <DialogHeader>
-            <DialogTitle>{t('Sign in required')}</DialogTitle>
-            <DialogDescription>
-              {t('Please sign in to view {{module}}.', {
-                module: authPromptTarget?.title || '',
-              })}
-            </DialogDescription>
-          </DialogHeader>
-          <div className='bg-muted/40 text-muted-foreground rounded-lg px-3 py-2 text-sm'>
-            {t('Redirecting to sign in in {{seconds}} seconds.', {
-              seconds: authPromptSecondsLeft,
-            })}
-          </div>
-          <DialogFooter>
-            <Button variant='outline' onClick={closeAuthPrompt}>
-              {t('Cancel')}
-            </Button>
-            <Button onClick={navigateToSignIn}>{t('Sign in now')}</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
 
       {/* Notification Dialog */}
       {showNotifications && (

@@ -301,6 +301,7 @@ export function ChannelMutateDrawer({
   const { setOpen } = useChannels()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [customModel, setCustomModel] = useState('')
+  const [isFetchingModels, setIsFetchingModels] = useState(false)
   const [fetchModelsDialogOpen, setFetchModelsDialogOpen] = useState(false)
   const [channelKey, setChannelKey] = useState<string | null>(null)
   const [isChannelKeyLoading, setIsChannelKeyLoading] = useState(false)
@@ -766,29 +767,46 @@ export function ChannelMutateDrawer({
       return
     }
 
-    // For creation mode, validate key before opening dialog
-    if (!isEditing) {
-      const key = form.getValues('key')
-      if (!key?.trim()) {
-        toast.error(t('Please enter API key first'))
+    if (isEditing) {
+      setFetchModelsDialogOpen(true)
+      return
+    }
+
+    const key = form.getValues('key')
+    if (!key?.trim()) {
+      toast.error(t('Please enter API key first'))
+      return
+    }
+
+    setIsFetchingModels(true)
+    try {
+      const response = await fetchModels({
+        type: form.getValues('type'),
+        key,
+        base_url: form.getValues('base_url') || '',
+      })
+
+      if (response.success && response.data) {
+        const existingModels = parseModelsString(form.getValues('models') || '')
+        const nextModels = Array.from(
+          new Set([...existingModels, ...response.data])
+        )
+        form.setValue('models', formatModelsArray(nextModels))
+        toast.success(
+          t('Fetched {{count}} model(s) from upstream', {
+            count: response.data.length,
+          })
+        )
         return
       }
-    }
 
-    setFetchModelsDialogOpen(true)
+      toast.error(t('No models fetched from upstream'))
+    } catch (error: unknown) {
+      toast.error(getErrorMessage(error) || t('Failed to fetch models'))
+    } finally {
+      setIsFetchingModels(false)
+    }
   }, [isEditing, form, t])
-
-  const createModeFetcher = useCallback(async (): Promise<string[]> => {
-    const response = await fetchModels({
-      type: form.getValues('type'),
-      key: form.getValues('key'),
-      base_url: form.getValues('base_url') || '',
-    })
-    if (response.success && response.data) {
-      return response.data
-    }
-    throw new Error(response.message || 'No models fetched from upstream')
-  }, [form])
 
   // Handle adding custom models
   const handleAddCustomModels = useCallback(() => {
@@ -2219,8 +2237,13 @@ export function ChannelMutateDrawer({
                                 variant='outline'
                                 size='sm'
                                 onClick={handleFetchModels}
+                                disabled={isFetchingModels}
                               >
-                                <Sparkles className='mr-2 h-4 w-4' />
+                                {isFetchingModels ? (
+                                  <Loader2 className='mr-2 h-4 w-4 animate-spin' />
+                                ) : (
+                                  <Sparkles className='mr-2 h-4 w-4' />
+                                )}
                                 {t('Fetch from Upstream')}
                               </Button>
                             )}
@@ -3379,10 +3402,6 @@ export function ChannelMutateDrawer({
         }}
         redirectModels={redirectModelList}
         redirectSourceModels={redirectModelKeyList}
-        customFetcher={!isEditing ? createModeFetcher : undefined}
-        existingModelsOverride={
-          !isEditing ? parseModelsString(form.getValues('models') || '') : undefined
-        }
       />
 
       <SecureVerificationDialog

@@ -114,6 +114,8 @@ const paymentSchema = z.object({
       })
     }
   }),
+  InviteeFirstTopupDiscount: z.coerce.number().min(0).max(1),
+  InviteeFirstTopupDiscountMin: z.coerce.number().min(0),
   StripeApiSecret: z.string(),
   StripeWebhookSecret: z.string(),
   StripePriceId: z.string(),
@@ -149,6 +151,8 @@ type PaymentSettingsSectionProps = {
   defaultValues: PaymentFormValues
   waffoDefaultValues: WaffoSettingsValues
   waffoPancakeDefaultValues: WaffoPancakeSettingsValues
+  waffoPancakeProvisionedStoreID?: string
+  waffoPancakeProvisionedProductID?: string
   complianceDefaults: PaymentComplianceDefaults
 }
 
@@ -156,6 +160,8 @@ export function PaymentSettingsSection({
   defaultValues,
   waffoDefaultValues,
   waffoPancakeDefaultValues,
+  waffoPancakeProvisionedStoreID,
+  waffoPancakeProvisionedProductID,
   complianceDefaults,
 }: PaymentSettingsSectionProps) {
   const { t } = useTranslation()
@@ -282,6 +288,9 @@ export function PaymentSettingsSection({
       PayMethods: values.PayMethods.trim(),
       AmountOptions: values.AmountOptions.trim(),
       AmountDiscount: values.AmountDiscount.trim(),
+      InviteeFirstTopupDiscount: values.InviteeFirstTopupDiscount as number,
+      InviteeFirstTopupDiscountMin:
+        values.InviteeFirstTopupDiscountMin as number,
     }
 
     const initial = {
@@ -290,6 +299,10 @@ export function PaymentSettingsSection({
       PayMethods: initialRef.current.PayMethods.trim(),
       AmountOptions: initialRef.current.AmountOptions.trim(),
       AmountDiscount: initialRef.current.AmountDiscount.trim(),
+      InviteeFirstTopupDiscount:
+        initialRef.current.InviteeFirstTopupDiscount,
+      InviteeFirstTopupDiscountMin:
+        initialRef.current.InviteeFirstTopupDiscountMin,
     }
 
     const updates: Array<{ key: string; value: string | number }> = []
@@ -326,6 +339,26 @@ export function PaymentSettingsSection({
       updates.push({
         key: 'payment_setting.amount_discount',
         value: sanitized.AmountDiscount,
+      })
+    }
+
+    if (
+      sanitized.InviteeFirstTopupDiscount !==
+      initial.InviteeFirstTopupDiscount
+    ) {
+      updates.push({
+        key: 'payment_setting.invitee_first_topup_discount',
+        value: sanitized.InviteeFirstTopupDiscount,
+      })
+    }
+
+    if (
+      sanitized.InviteeFirstTopupDiscountMin !==
+      initial.InviteeFirstTopupDiscountMin
+    ) {
+      updates.push({
+        key: 'payment_setting.invitee_first_topup_discount_min',
+        value: sanitized.InviteeFirstTopupDiscountMin,
       })
     }
 
@@ -524,6 +557,8 @@ export function PaymentSettingsSection({
       PayMethods: values.PayMethods.trim(),
       AmountOptions: values.AmountOptions.trim(),
       AmountDiscount: values.AmountDiscount.trim(),
+      InviteeFirstTopupDiscount: values.InviteeFirstTopupDiscount,
+      InviteeFirstTopupDiscountMin: values.InviteeFirstTopupDiscountMin,
       StripeApiSecret: values.StripeApiSecret.trim(),
       StripeWebhookSecret: values.StripeWebhookSecret.trim(),
       StripePriceId: values.StripePriceId.trim(),
@@ -544,6 +579,10 @@ export function PaymentSettingsSection({
       PayMethods: initialRef.current.PayMethods.trim(),
       AmountOptions: initialRef.current.AmountOptions.trim(),
       AmountDiscount: initialRef.current.AmountDiscount.trim(),
+      InviteeFirstTopupDiscount:
+        initialRef.current.InviteeFirstTopupDiscount,
+      InviteeFirstTopupDiscountMin:
+        initialRef.current.InviteeFirstTopupDiscountMin,
       StripeApiSecret: initialRef.current.StripeApiSecret.trim(),
       StripeWebhookSecret: initialRef.current.StripeWebhookSecret.trim(),
       StripePriceId: initialRef.current.StripePriceId.trim(),
@@ -606,6 +645,26 @@ export function PaymentSettingsSection({
       updates.push({
         key: 'payment_setting.amount_discount',
         value: sanitized.AmountDiscount,
+      })
+    }
+
+    if (
+      sanitized.InviteeFirstTopupDiscount !==
+      initial.InviteeFirstTopupDiscount
+    ) {
+      updates.push({
+        key: 'payment_setting.invitee_first_topup_discount',
+        value: sanitized.InviteeFirstTopupDiscount,
+      })
+    }
+
+    if (
+      sanitized.InviteeFirstTopupDiscountMin !==
+      initial.InviteeFirstTopupDiscountMin
+    ) {
+      updates.push({
+        key: 'payment_setting.invitee_first_topup_discount_min',
+        value: sanitized.InviteeFirstTopupDiscountMin,
       })
     }
 
@@ -954,6 +1013,67 @@ export function PaymentSettingsSection({
                     </FormControl>
                     <FormDescription>
                       {t('Discount map by recharge amount (JSON object)')}
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <div className='grid gap-6 md:grid-cols-2'>
+              <FormField
+                control={form.control}
+                name='InviteeFirstTopupDiscount'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      {t('Invitation first top-up discount')}
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type='number'
+                        step='0.01'
+                        min={0}
+                        max={1}
+                        value={(field.value ?? 1) as number}
+                        onChange={(event) =>
+                          field.onChange(event.target.valueAsNumber)
+                        }
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      {t(
+                        'Final price multiplier for invited users on their first top-up. Use 0.9 for 10% off; 1 disables it.'
+                      )}
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name='InviteeFirstTopupDiscountMin'
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      {t('Invitation discount minimum amount')}
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        type='number'
+                        step='1'
+                        min={0}
+                        value={(field.value ?? 0) as number}
+                        onChange={(event) =>
+                          field.onChange(event.target.valueAsNumber)
+                        }
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      {t(
+                        'Minimum top-up amount required for the invitation discount. Use 0 for no minimum.'
+                      )}
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -1468,11 +1588,15 @@ export function PaymentSettingsSection({
 
       <Separator />
 
-      <WaffoSettingsSection defaultValues={waffoDefaultValues} />
+      <WaffoPancakeSettingsSection
+        defaultValues={waffoPancakeDefaultValues}
+        provisionedStoreID={waffoPancakeProvisionedStoreID}
+        provisionedProductID={waffoPancakeProvisionedProductID}
+      />
 
       <Separator />
 
-      <WaffoPancakeSettingsSection defaultValues={waffoPancakeDefaultValues} />
+      <WaffoSettingsSection defaultValues={waffoDefaultValues} />
       {/* eslint-enable react-hooks/refs */}
     </SettingsSection>
   )

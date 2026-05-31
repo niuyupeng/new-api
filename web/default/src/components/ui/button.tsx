@@ -16,7 +16,13 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { isValidElement } from 'react'
+import {
+  cloneElement,
+  forwardRef,
+  isValidElement,
+  type ButtonHTMLAttributes,
+  type ReactElement,
+} from 'react'
 import { Button as ButtonPrimitive } from '@base-ui/react/button'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { cn } from '@/lib/utils'
@@ -65,23 +71,57 @@ function isNativeButtonRender(render: ButtonPrimitive.Props['render']) {
   return render.type === 'button'
 }
 
-function Button({
-  className,
-  variant = 'default',
-  size = 'default',
-  nativeButton,
-  render,
-  ...props
-}: ButtonPrimitive.Props & VariantProps<typeof buttonVariants>) {
+type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
+  VariantProps<typeof buttonVariants> & {
+    asChild?: boolean
+    nativeButton?: ButtonPrimitive.Props['nativeButton']
+    render?: ButtonPrimitive.Props['render']
+  }
+
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
+  {
+    asChild,
+    children,
+    className,
+    variant = 'default',
+    size = 'default',
+    nativeButton,
+    render,
+    type,
+    ...props
+  },
+  ref
+) {
+  const buttonClassName = cn(buttonVariants({ variant, size, className }))
+
+  if (asChild && isValidElement(children)) {
+    const child = children as ReactElement<{ className?: string }>
+    return cloneElement(child, {
+      ...props,
+      className: cn(buttonClassName, child.props.className),
+    })
+  }
+
+  const resolvedNativeButton = nativeButton ?? isNativeButtonRender(render)
+  const primitiveProps = {
+    ...props,
+    ...(resolvedNativeButton ? { type: type ?? 'button' } : {}),
+  } as Omit<ButtonPrimitive.Props, 'className' | 'nativeButton' | 'render'>
+
   return (
     <ButtonPrimitive
+      ref={ref}
       data-slot='button'
-      className={cn(buttonVariants({ variant, size, className }))}
-      nativeButton={nativeButton ?? isNativeButtonRender(render)}
+      className={buttonClassName}
+      nativeButton={resolvedNativeButton}
       render={render}
-      {...props}
-    />
+      {...primitiveProps}
+    >
+      {children}
+    </ButtonPrimitive>
   )
-}
+})
+
+Button.displayName = 'Button'
 
 export { Button, buttonVariants }

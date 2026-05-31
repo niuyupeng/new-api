@@ -114,12 +114,25 @@ export function ChannelsTable() {
   })
 
   // Extract filters from column filters
-  const statusFilter =
-    (columnFilters.find((f) => f.id === 'status')?.value as string[]) || []
-  const typeFilter =
-    (columnFilters.find((f) => f.id === 'type')?.value as string[]) || []
-  const groupFilter =
-    (columnFilters.find((f) => f.id === 'group')?.value as string[]) || []
+  const statusFilter = useMemo(
+    () =>
+      (columnFilters.find((filter) => filter.id === 'status')
+        ?.value as string[]) || [],
+    [columnFilters]
+  )
+  const typeFilter = useMemo(
+    () =>
+      (columnFilters.find((filter) => filter.id === 'type')?.value as
+        | string[]
+        | undefined) || [],
+    [columnFilters]
+  )
+  const groupFilter = useMemo(
+    () =>
+      (columnFilters.find((filter) => filter.id === 'group')
+        ?.value as string[]) || [],
+    [columnFilters]
+  )
   const modelFilterFromUrl =
     (columnFilters.find((f) => f.id === 'model')?.value as string) || ''
 

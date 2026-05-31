@@ -192,7 +192,7 @@ export function PricingToolbar(props: PricingToolbarProps) {
         </div>
 
         <div className='flex flex-wrap items-center gap-2'>
-          <div className='hidden items-center gap-2 sm:flex'>
+          <div className='flex flex-wrap items-center gap-2'>
             <SegmentedControl
               options={[
                 { value: 'standard', label: t('Standard') },

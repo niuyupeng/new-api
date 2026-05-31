@@ -16,13 +16,23 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
+import { useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '@/stores/auth-store'
 import { Markdown } from '@/components/ui/markdown'
 import { PublicLayout } from '@/components/layout'
 import { Footer } from '@/components/layout/components/footer'
-import { CTA, Features, Hero, HowItWorks, Stats } from './components'
+import { ccapiPublicNavLinks } from '@/features/ccapi/public-nav'
+import { CTA, Features, Hero, HowItWorks, Stats, Trust } from './components'
 import { useHomePageContent } from './hooks'
+
+const ccapiHeaderProps = {
+  navLinks: ccapiPublicNavLinks,
+  siteName: 'ccapi',
+  headerProps: {
+    className: 'ccapi-public-header',
+  },
+} as const
 
 export function Home() {
   const { t } = useTranslation()
@@ -30,10 +40,28 @@ export function Home() {
   const isAuthenticated = !!auth.user
   const { content, isLoaded, isUrl } = useHomePageContent()
 
+  useEffect(() => {
+    const removeLegacyHomeOverlay = () => {
+      document.body.classList.remove('ccapi-home-active')
+      document.getElementById('ccapi-home-cover')?.remove()
+    }
+
+    removeLegacyHomeOverlay()
+
+    const observer = new MutationObserver(removeLegacyHomeOverlay)
+    observer.observe(document.body, {
+      attributeFilter: ['class'],
+      attributes: true,
+      childList: true,
+    })
+
+    return () => observer.disconnect()
+  }, [])
+
   if (!isLoaded) {
     return (
-      <PublicLayout showMainContainer={false}>
-        <main className='flex min-h-screen items-center justify-center'>
+      <PublicLayout showMainContainer={false} {...ccapiHeaderProps}>
+        <main className='flex min-h-svh items-center justify-center'>
           <div className='text-muted-foreground'>{t('Loading...')}</div>
         </main>
       </PublicLayout>
@@ -42,12 +70,12 @@ export function Home() {
 
   if (content) {
     return (
-      <PublicLayout showMainContainer={false}>
+      <PublicLayout showMainContainer={false} {...ccapiHeaderProps}>
         <main className='overflow-x-hidden'>
           {isUrl ? (
             <iframe
               src={content}
-              className='h-screen w-full border-none'
+              className='h-svh w-full border-none'
               title={t('Custom Home Page')}
             />
           ) : (
@@ -61,11 +89,12 @@ export function Home() {
   }
 
   return (
-    <PublicLayout showMainContainer={false}>
+    <PublicLayout showMainContainer={false} {...ccapiHeaderProps}>
       <Hero isAuthenticated={isAuthenticated} />
       <Stats />
       <Features />
       <HowItWorks />
+      <Trust />
       <CTA isAuthenticated={isAuthenticated} />
       <Footer />
     </PublicLayout>

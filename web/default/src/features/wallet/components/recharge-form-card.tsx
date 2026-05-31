@@ -17,7 +17,15 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { useState, useEffect } from 'react'
-import { Gift, ExternalLink, Loader2, Receipt, WalletCards } from 'lucide-react'
+import {
+  ArrowRight,
+  CreditCard,
+  ExternalLink,
+  Gift,
+  Loader2,
+  Receipt,
+  WalletCards,
+} from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { formatNumber } from '@/lib/format'
 import { cn } from '@/lib/utils'
@@ -40,6 +48,8 @@ import {
   getPaymentIcon,
   getMinTopupAmount,
   calculatePresetPricing,
+  getEffectiveTopupDiscount,
+  buildExternalTopupLink,
 } from '../lib'
 import type {
   PaymentMethod,
@@ -76,7 +86,7 @@ interface RechargeFormCardProps {
   enableWaffoTopup?: boolean
   waffoPayMethods?: WaffoPayMethod[]
   waffoMinTopup?: number
-  onWaffoMethodSelect?: (method: WaffoPayMethod, index: number) => void
+  onWaffoMethodSelect?: (method: WaffoPayMethod | null, index?: number) => void
   enableWaffoPancakeTopup?: boolean
 }
 
@@ -134,8 +144,18 @@ export function RechargeFormCard({
     Array.isArray(topupInfo?.pay_methods) && topupInfo.pay_methods.length > 0
   const hasWaffoPaymentMethods =
     Array.isArray(waffoPayMethods) && waffoPayMethods.length > 0
+  const complianceConfirmed = topupInfo?.payment_compliance_confirmed !== false
   const minTopup = getMinTopupAmount(topupInfo)
   const redemptionEnabled = topupInfo?.enable_redemption !== false
+  const inviteDiscount = topupInfo?.invite_discount
+  const inviteDiscountRate = inviteDiscount?.discount_rate ?? 1
+  const inviteDiscountPercent = Math.round((1 - inviteDiscountRate) * 100)
+  const showInviteDiscount =
+    Boolean(inviteDiscount?.eligible) &&
+    inviteDiscountRate > 0 &&
+    inviteDiscountRate < 1
+  const externalTopupLink = buildExternalTopupLink(topupLink, inviteDiscount)
+  const hasExternalTopupLink = !!externalTopupLink
 
   if (loading) {
     return (
@@ -206,11 +226,90 @@ export function RechargeFormCard({
       }
       contentClassName='space-y-4 sm:space-y-6'
     >
+      {hasExternalTopupLink && (
+        <div className='border-primary/20 from-primary/10 via-background to-muted/40 relative overflow-hidden rounded-xl border bg-gradient-to-br p-4 shadow-sm sm:p-5'>
+          <div className='bg-primary/10 pointer-events-none absolute top-0 right-0 h-28 w-28 translate-x-10 -translate-y-10 rounded-full blur-2xl' />
+          <div className='relative flex flex-col gap-4 md:flex-row md:items-center md:justify-between'>
+            <div className='flex min-w-0 gap-3'>
+              <div className='bg-background/80 text-primary flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border shadow-sm'>
+                <CreditCard className='h-5 w-5' />
+              </div>
+              <div className='min-w-0 space-y-1'>
+                <div className='text-foreground text-base font-semibold'>
+                  {t('Recharge Portal')}
+                </div>
+                <p className='text-muted-foreground max-w-2xl text-sm leading-6'>
+                  {showInviteDiscount
+                    ? t(
+                        'This recharge link includes your invite discount details. Final pricing is handled by the external checkout.'
+                      )
+                    : t(
+                        'Use the configured external recharge link to buy balance or redemption codes.'
+                      )}
+                </p>
+                {showInviteDiscount && (
+                  <div className='mt-2 inline-flex w-fit flex-wrap items-center gap-2 rounded-md border border-emerald-200 bg-emerald-50 px-2 py-1 text-xs font-medium text-emerald-700 dark:border-emerald-900 dark:bg-emerald-950/40 dark:text-emerald-200'>
+                    <Gift className='h-3.5 w-3.5' />
+                    {t('Invitation first top-up available')}
+                  </div>
+                )}
+                {!complianceConfirmed && (
+                  <p className='text-muted-foreground/80 text-xs leading-5'>
+                    {t(
+                      'Payments currently use the external checkout link configured by the site owner.'
+                    )}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            <Button
+              asChild
+              size='lg'
+              className='h-10 w-full gap-2 rounded-xl md:w-auto'
+            >
+              <a
+                href={externalTopupLink}
+                target='_blank'
+                rel='noopener noreferrer'
+                aria-label={t('Open Recharge Link')}
+              >
+                {t('Open Recharge Link')}
+                <ExternalLink className='h-4 w-4' />
+              </a>
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Online Topup Section */}
       {hasAnyTopup ? (
         <div className='space-y-4 sm:space-y-6'>
           {hasConfigurableTopup && (
             <>
+              {showInviteDiscount && (
+                <div className='flex gap-3 rounded-lg border border-emerald-200 bg-emerald-50/80 p-3 text-emerald-950 dark:border-emerald-900/60 dark:bg-emerald-950/30 dark:text-emerald-100'>
+                  <div className='bg-background/80 flex h-9 w-9 shrink-0 items-center justify-center rounded-md border border-emerald-200 dark:border-emerald-900'>
+                    <Gift className='h-4 w-4 text-emerald-600 dark:text-emerald-300' />
+                  </div>
+                  <div className='min-w-0 space-y-1'>
+                    <div className='flex flex-wrap items-center gap-2 text-sm font-semibold'>
+                      <span>{t('Invitation discount active')}</span>
+                      <span className='rounded border border-emerald-300 px-1.5 py-0.5 text-[11px] font-medium dark:border-emerald-700'>
+                        {t('{{percent}}% off first top-up', {
+                          percent: inviteDiscountPercent,
+                        })}
+                      </span>
+                    </div>
+                    <p className='text-xs leading-5 text-emerald-700 dark:text-emerald-200'>
+                      {t(
+                        'The best available invite price is applied automatically at checkout.'
+                      )}
+                    </p>
+                  </div>
+                </div>
+              )}
+
               {presetAmounts.length > 0 && (
                 <div className='space-y-2.5 sm:space-y-3'>
                   <Label className='text-muted-foreground text-xs font-medium tracking-wider uppercase'>
@@ -218,10 +317,11 @@ export function RechargeFormCard({
                   </Label>
                   <div className='grid grid-cols-2 gap-1.5 sm:gap-3 md:grid-cols-4'>
                     {presetAmounts.map((preset, index) => {
-                      const discount =
-                        preset.discount ||
-                        topupInfo?.discount?.[preset.value] ||
-                        1.0
+                      const effectiveDiscount = getEffectiveTopupDiscount(
+                        topupInfo,
+                        preset.value
+                      )
+                      const discount = effectiveDiscount.rate
                       const {
                         displayValue,
                         actualPrice,
@@ -240,7 +340,7 @@ export function RechargeFormCard({
                           className={cn(
                             'hover:border-foreground flex min-h-16 flex-col items-start rounded-lg px-3 py-2.5 text-left whitespace-normal sm:min-h-[72px] sm:p-4',
                             selectedPreset === preset.value
-                              ? 'border-foreground bg-foreground/5'
+                              ? 'border-foreground bg-foreground/5 dark:border-foreground dark:bg-foreground/10'
                               : 'border-muted'
                           )}
                           onClick={() => onSelectPreset(preset)}
@@ -251,16 +351,24 @@ export function RechargeFormCard({
                             </div>
                             {hasDiscount && (
                               <div className='text-xs font-medium text-green-600'>
-                                {getDiscountLabel(discount)}
+                                {effectiveDiscount.isInviteDiscount
+                                  ? t('Invite {{percent}}% off', {
+                                      percent: Math.round((1 - discount) * 100),
+                                    })
+                                  : getDiscountLabel(discount)}
                               </div>
                             )}
                           </div>
                           <div className='text-muted-foreground mt-1.5 w-full text-xs sm:mt-2'>
-                            Pay {formatCurrency(actualPrice)}
+                            {t('Pay {{amount}}', {
+                              amount: formatCurrency(actualPrice),
+                            })}
                             {hasDiscount && savedAmount > 0 && (
                               <span className='text-green-600'>
                                 {' '}
-                                • Save {formatCurrency(savedAmount)}
+                                {t('• Save {{amount}}', {
+                                  amount: formatCurrency(savedAmount),
+                                })}
                               </span>
                             )}
                           </div>
@@ -362,13 +470,12 @@ export function RechargeFormCard({
                 )}
               </div>
 
-              {enableWaffoTopup &&
-                hasWaffoPaymentMethods &&
-                onWaffoMethodSelect && (
-                  <div className='space-y-2.5 sm:space-y-3'>
-                    <Label className='text-muted-foreground text-xs font-medium tracking-wider uppercase'>
-                      {t('Waffo Payment')}
-                    </Label>
+              {enableWaffoTopup && onWaffoMethodSelect && (
+                <div className='space-y-2.5 sm:space-y-3'>
+                  <Label className='text-muted-foreground text-xs font-medium tracking-wider uppercase'>
+                    {t('Waffo Payment')}
+                  </Label>
+                  {hasWaffoPaymentMethods ? (
                     <div className='grid grid-cols-2 gap-1.5 sm:gap-3 lg:grid-cols-3'>
                       {waffoPayMethods?.map((method, index) => {
                         const loadingKey = `waffo-${index}`
@@ -414,17 +521,50 @@ export function RechargeFormCard({
                         )
                       })}
                     </div>
-                  </div>
-                )}
+                  ) : (
+                    <Button
+                      variant='outline'
+                      onClick={() => onWaffoMethodSelect(null)}
+                      disabled={
+                        (waffoMinTopup || 0) > topupAmount || !!paymentLoading
+                      }
+                      className='h-auto min-h-11 w-full justify-between gap-3 rounded-xl px-4 py-3 text-left whitespace-normal'
+                    >
+                      <span className='flex min-w-0 items-center gap-3'>
+                        {paymentLoading === 'waffo-auto' ? (
+                          <Loader2 className='h-4 w-4 shrink-0 animate-spin' />
+                        ) : (
+                          getPaymentIcon('waffo', 'h-4 w-4 shrink-0')
+                        )}
+                        <span className='min-w-0'>
+                          <span className='block font-medium'>
+                            {t('Automatic Waffo checkout')}
+                          </span>
+                          <span className='text-muted-foreground block text-xs'>
+                            {t(
+                              'Let the payment provider choose the best available method.'
+                            )}
+                          </span>
+                        </span>
+                      </span>
+                      <ArrowRight className='h-4 w-4 shrink-0' />
+                    </Button>
+                  )}
+                </div>
+              )}
             </>
           )}
         </div>
       ) : (
         <Alert>
           <AlertDescription>
-            {t(
-              'Online topup is not enabled. Please use redemption code or contact administrator.'
-            )}
+            {hasExternalTopupLink
+              ? t(
+                  'Online checkout is not enabled here. Use the recharge link above, or contact support if you already paid.'
+                )
+              : t(
+                  'Online topup is not enabled. Please use redemption code or contact administrator.'
+                )}
           </AlertDescription>
         </Alert>
       )}
@@ -466,6 +606,7 @@ export function RechargeFormCard({
               className='h-9 min-w-0'
             />
             <Button
+              type='button'
               onClick={onRedeem}
               disabled={redeeming}
               variant='outline'
@@ -479,7 +620,7 @@ export function RechargeFormCard({
             <p className='text-muted-foreground text-xs'>
               {t('Need a redemption code?')}{' '}
               <a
-                href={topupLink}
+                href={externalTopupLink || topupLink}
                 target='_blank'
                 rel='noopener noreferrer'
                 className='inline-flex items-center gap-1 underline-offset-4 hover:underline'
@@ -491,13 +632,44 @@ export function RechargeFormCard({
           )}
         </div>
       ) : (
-        <Alert className='border-t'>
-          <AlertDescription>
-            {t(
-              'Redemption codes are disabled until the administrator confirms compliance terms.'
-            )}
-          </AlertDescription>
-        </Alert>
+        <div className='space-y-2.5 border-t pt-4 sm:space-y-3 sm:pt-6'>
+          <div className='flex items-center gap-2'>
+            <Gift className='text-muted-foreground h-4 w-4' />
+            <Label
+              htmlFor='redemption-code-disabled'
+              className='text-muted-foreground text-xs font-medium tracking-wider uppercase'
+            >
+              {t('Have a Code?')}
+            </Label>
+          </div>
+          <div className='grid grid-cols-[minmax(0,1fr)_auto] gap-2'>
+            <Input
+              id='redemption-code-disabled'
+              disabled
+              placeholder={t('Redemption code entry is currently disabled')}
+              className='h-9 min-w-0'
+            />
+            <Button
+              type='button'
+              disabled
+              variant='outline'
+              className='h-9 px-4'
+            >
+              {t('Redeem')}
+            </Button>
+          </div>
+          <Alert>
+            <AlertDescription>
+              {hasExternalTopupLink
+                ? t(
+                    'Redemption code entry is disabled here. Use the recharge link above if this site is configured for external recharge.'
+                  )
+                : t(
+                    'Redemption codes are disabled until the administrator confirms compliance terms.'
+                  )}
+            </AlertDescription>
+          </Alert>
+        </div>
       )}
     </TitledCard>
   )

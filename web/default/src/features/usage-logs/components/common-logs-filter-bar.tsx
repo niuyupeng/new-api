@@ -92,12 +92,12 @@ export function CommonLogsFilterBar<TData>(
       next.upstreamRequestId = searchParams.upstreamRequestId
 
     if (Object.keys(next).length > 0) {
-      setFilters((prev) => ({ ...prev, ...next }))
+      queueMicrotask(() => setFilters((prev) => ({ ...prev, ...next })))
     }
 
     const typeArr = searchParams.type
     if (Array.isArray(typeArr) && typeArr.length === 1) {
-      setLogType(typeArr[0])
+      queueMicrotask(() => setLogType(typeArr[0]))
     }
   }, [
     searchParams.startTime,

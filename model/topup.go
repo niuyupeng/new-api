@@ -16,6 +16,11 @@ type TopUp struct {
 	UserId          int     `json:"user_id" gorm:"index"`
 	Amount          int64   `json:"amount"`
 	Money           float64 `json:"money"`
+	OriginalMoney   float64 `json:"original_money"`
+	DiscountRate    float64 `json:"discount_rate"`
+	DiscountAmount  float64 `json:"discount_amount"`
+	DiscountType    string  `json:"discount_type" gorm:"type:varchar(50);default:''"`
+	QuotaToAdd      int64   `json:"quota_to_add"`
 	TradeNo         string  `json:"trade_no" gorm:"unique;type:varchar(255);index"`
 	PaymentMethod   string  `json:"payment_method" gorm:"type:varchar(50)"`
 	PaymentProvider string  `json:"payment_provider" gorm:"type:varchar(50);default:''"`
@@ -37,6 +42,11 @@ const (
 	PaymentProviderCreem        = "creem"
 	PaymentProviderWaffo        = "waffo"
 	PaymentProviderWaffoPancake = "waffo_pancake"
+)
+
+const (
+	TopUpDiscountTypeAmount            = "amount"
+	TopUpDiscountTypeInviteeFirstTopup = "invitee_first_topup"
 )
 
 var (
@@ -77,6 +87,54 @@ func GetTopUpByTradeNo(tradeNo string) *TopUp {
 	return topUp
 }
 
+func (topUp *TopUp) ResolveQuotaToAdd() int {
+	if topUp.QuotaToAdd > 0 {
+		return int(topUp.QuotaToAdd)
+	}
+
+	if topUp.PaymentProvider == PaymentProviderStripe && topUp.Money > 0 {
+		return int(decimal.NewFromFloat(topUp.Money).
+			Mul(decimal.NewFromFloat(common.QuotaPerUnit)).
+			IntPart())
+	}
+
+	return int(decimal.NewFromInt(topUp.Amount).
+		Mul(decimal.NewFromFloat(common.QuotaPerUnit)).
+		IntPart())
+}
+
+func UserHasTopUpWithStatuses(userId int, statuses []string) (bool, error) {
+	if userId == 0 || len(statuses) == 0 {
+		return false, nil
+	}
+
+	var count int64
+	err := DB.Model(&TopUp{}).
+		Where("user_id = ? AND status IN ?", userId, statuses).
+		Count(&count).Error
+	if err != nil {
+		return false, err
+	}
+
+	return count > 0, nil
+}
+
+func UserHasPendingTopUpDiscount(userId int, discountType string) (bool, error) {
+	if userId == 0 || discountType == "" {
+		return false, nil
+	}
+
+	var count int64
+	err := DB.Model(&TopUp{}).
+		Where("user_id = ? AND status = ? AND discount_type = ?", userId, common.TopUpStatusPending, discountType).
+		Count(&count).Error
+	if err != nil {
+		return false, err
+	}
+
+	return count > 0, nil
+}
+
 func UpdatePendingTopUpStatus(tradeNo string, expectedPaymentProvider string, targetStatus string) error {
 	if tradeNo == "" {
 		return errors.New("未提供支付单号")
@@ -109,7 +167,7 @@ func Recharge(referenceId string, customerId string, callerIp string) (err error
 		return errors.New("未提供支付单号")
 	}
 
-	var quota float64
+	var quotaToAdd int
 	topUp := &TopUp{}
 
 	refCol := "`trade_no`"
@@ -138,8 +196,12 @@ func Recharge(referenceId string, customerId string, callerIp string) (err error
 			return err
 		}
 
-		quota = topUp.Money * common.QuotaPerUnit
-		err = tx.Model(&User{}).Where("id = ?", topUp.UserId).Updates(map[string]interface{}{"stripe_customer": customerId, "quota": gorm.Expr("quota + ?", quota)}).Error
+		quotaToAdd = topUp.ResolveQuotaToAdd()
+		if quotaToAdd <= 0 {
+			return errors.New("无效的充值额度")
+		}
+
+		err = tx.Model(&User{}).Where("id = ?", topUp.UserId).Updates(map[string]interface{}{"stripe_customer": customerId, "quota": gorm.Expr("quota + ?", quotaToAdd)}).Error
 		if err != nil {
 			return err
 		}
@@ -152,7 +214,7 @@ func Recharge(referenceId string, customerId string, callerIp string) (err error
 		return errors.New("充值失败，请稍后重试")
 	}
 
-	RecordTopupLog(topUp.UserId, fmt.Sprintf("使用在线充值成功，充值金额: %v，支付金额：%d", logger.FormatQuota(int(quota)), topUp.Amount), callerIp, topUp.PaymentMethod, PaymentMethodStripe)
+	RecordTopupLog(topUp.UserId, fmt.Sprintf("使用在线充值成功，充值金额: %v，支付金额：%.2f", logger.FormatQuota(quotaToAdd), topUp.Money), callerIp, topUp.PaymentMethod, PaymentMethodStripe)
 
 	return nil
 }
@@ -346,17 +408,7 @@ func ManualCompleteTopUp(tradeNo string, callerIp string) error {
 			return errors.New("订单状态不是待支付，无法补单")
 		}
 
-		// 计算应充值额度：
-		// - Stripe 订单：Money 代表经分组倍率换算后的美元数量，直接 * QuotaPerUnit
-		// - 其他订单（如易支付）：Amount 为美元数量，* QuotaPerUnit
-		if topUp.PaymentProvider == PaymentProviderStripe {
-			dQuotaPerUnit := decimal.NewFromFloat(common.QuotaPerUnit)
-			quotaToAdd = int(decimal.NewFromFloat(topUp.Money).Mul(dQuotaPerUnit).IntPart())
-		} else {
-			dAmount := decimal.NewFromInt(topUp.Amount)
-			dQuotaPerUnit := decimal.NewFromFloat(common.QuotaPerUnit)
-			quotaToAdd = int(dAmount.Mul(dQuotaPerUnit).IntPart())
-		}
+		quotaToAdd = topUp.ResolveQuotaToAdd()
 		if quotaToAdd <= 0 {
 			return errors.New("无效的充值额度")
 		}

@@ -22,7 +22,12 @@ import {
   DEFAULT_PAYMENT_TYPE,
   DEFAULT_MIN_TOPUP,
 } from '../constants'
-import type { PresetAmount, TopupInfo } from '../types'
+import type {
+  InviteDiscountInfo,
+  PresetAmount,
+  TopupDiscountType,
+  TopupInfo,
+} from '../types'
 
 // ============================================================================
 // Payment Processing Functions
@@ -165,4 +170,131 @@ export function mergePresetAmounts(
     value: amount,
     discount: discounts[amount] || 1.0,
   }))
+}
+
+export interface EffectiveTopupDiscount {
+  rate: number
+  type?: TopupDiscountType
+  hasDiscount: boolean
+  isInviteDiscount: boolean
+}
+
+function normalizeAmountDiscount(rate: number | undefined): number {
+  return typeof rate === 'number' && rate > 0 ? rate : 1.0
+}
+
+function normalizeInviteDiscount(rate: number | undefined): number {
+  return typeof rate === 'number' && rate > 0 && rate < 1 ? rate : 1.0
+}
+
+export function getEffectiveTopupDiscount(
+  topupInfo: TopupInfo | null,
+  amount: number
+): EffectiveTopupDiscount {
+  const amountDiscount = normalizeAmountDiscount(topupInfo?.discount?.[amount])
+  const inviteDiscount = topupInfo?.invite_discount
+  const inviteRate = normalizeInviteDiscount(inviteDiscount?.discount_rate)
+  const inviteMeetsMinAmount =
+    !inviteDiscount?.min_amount || amount >= inviteDiscount.min_amount
+
+  let rate = amountDiscount
+  let type: TopupDiscountType | undefined =
+    amountDiscount > 0 && amountDiscount < 1 ? 'amount' : undefined
+
+  if (inviteDiscount?.eligible && inviteMeetsMinAmount && inviteRate < rate) {
+    rate = inviteRate
+    type = 'invitee_first_topup'
+  }
+
+  return {
+    rate,
+    type,
+    hasDiscount: rate > 0 && rate < 1,
+    isInviteDiscount: type === 'invitee_first_topup',
+  }
+}
+
+function isInviteDiscountUsable(inviteDiscount?: InviteDiscountInfo): boolean {
+  return (
+    Boolean(inviteDiscount?.eligible) &&
+    normalizeInviteDiscount(inviteDiscount?.discount_rate) < 1
+  )
+}
+
+function getInviteDiscountPercent(inviteDiscount: InviteDiscountInfo): number {
+  if (inviteDiscount.discount_percent && inviteDiscount.discount_percent > 0) {
+    return inviteDiscount.discount_percent
+  }
+
+  return Math.round((1 - inviteDiscount.discount_rate) * 100)
+}
+
+function replacePlaceholder(
+  value: string,
+  placeholder: string,
+  replacement: string
+): string {
+  return value.split(`{${placeholder}}`).join(encodeURIComponent(replacement))
+}
+
+export function buildExternalTopupLink(
+  topupLink: string | undefined,
+  inviteDiscount?: InviteDiscountInfo
+): string {
+  const trimmedLink = topupLink?.trim() ?? ''
+  if (
+    !trimmedLink ||
+    !inviteDiscount ||
+    !isInviteDiscountUsable(inviteDiscount)
+  ) {
+    return trimmedLink
+  }
+
+  const inviteCode = inviteDiscount.invite_code ?? ''
+  const discountType = inviteDiscount.discount_type || 'invitee_first_topup'
+  const values: Record<string, string> = {
+    aff: inviteCode,
+    invite_code: inviteCode,
+    invite_discount: '1',
+    discount_type: discountType,
+    discount_rate: String(inviteDiscount.discount_rate),
+    discount_percent: String(getInviteDiscountPercent(inviteDiscount)),
+    min_amount: String(inviteDiscount.min_amount ?? 0),
+  }
+
+  const templatedLink = Object.entries(values).reduce(
+    (result, [key, value]) => replacePlaceholder(result, key, value),
+    trimmedLink
+  )
+  if (templatedLink !== trimmedLink) {
+    return templatedLink
+  }
+
+  try {
+    const origin =
+      typeof window === 'undefined'
+        ? 'http://localhost'
+        : window.location.origin
+    const isAbsolute = /^[a-zA-Z][a-zA-Z\d+\-.]*:/.test(templatedLink)
+    const isProtocolRelative = templatedLink.startsWith('//')
+    const url = new URL(templatedLink, origin)
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+      return templatedLink
+    }
+
+    Object.entries(values).forEach(([key, value]) => {
+      if (!value || url.searchParams.has(key)) {
+        return
+      }
+      url.searchParams.set(key, value)
+    })
+
+    if (isAbsolute || isProtocolRelative) {
+      return url.toString()
+    }
+
+    return `${url.pathname}${url.search}${url.hash}`
+  } catch {
+    return templatedLink
+  }
 }

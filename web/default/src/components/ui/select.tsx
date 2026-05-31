@@ -29,7 +29,35 @@ import {
 import { HugeiconsIcon } from '@hugeicons/react'
 import { cn } from '@/lib/utils'
 
-const Select = SelectPrimitive.Root
+type SelectValueType<Value, Multiple extends boolean | undefined> =
+  Multiple extends true ? Value[] : Value
+
+type SelectProps<
+  Value = string,
+  Multiple extends boolean | undefined = false,
+> = Omit<SelectPrimitive.Root.Props<Value, Multiple>, 'onValueChange'> & {
+  onValueChange?: (
+    value: SelectValueType<Value, Multiple> | (Multiple extends true ? never : null)
+  ) => void
+}
+
+function Select<Value = string, Multiple extends boolean | undefined = false>({
+  onValueChange,
+  ...props
+}: SelectProps<Value, Multiple>) {
+  return (
+    <SelectPrimitive.Root<Value, Multiple>
+      {...props}
+      onValueChange={
+        onValueChange
+          ? (value) => {
+              onValueChange(value)
+            }
+          : undefined
+      }
+    />
+  )
+}
 
 function SelectGroup({ className, ...props }: SelectPrimitive.Group.Props) {
   return (
@@ -41,7 +69,13 @@ function SelectGroup({ className, ...props }: SelectPrimitive.Group.Props) {
   )
 }
 
-function SelectValue({ className, ...props }: SelectPrimitive.Value.Props) {
+function SelectValue({
+  className,
+  placeholder: _placeholder,
+  ...props
+}: SelectPrimitive.Value.Props & {
+  placeholder?: React.ReactNode
+}) {
   return (
     <SelectPrimitive.Value
       data-slot='select-value'

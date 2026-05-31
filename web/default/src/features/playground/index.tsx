@@ -52,7 +52,7 @@ export function Playground() {
   // Load models
   const { data: modelsData, isLoading: isLoadingModels } = useQuery({
     queryKey: ['playground-models'],
-    queryFn: getUserModels,
+    queryFn: () => getUserModels(),
   })
 
   // Load groups

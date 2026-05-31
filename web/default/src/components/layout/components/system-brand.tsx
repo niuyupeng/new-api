@@ -18,6 +18,10 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
+import {
+  getCcapiDisplayName,
+  getCcapiLogoForDarkSurface,
+} from '@/lib/ccapi-brand'
 import { cn } from '@/lib/utils'
 import { useStatus } from '@/hooks/use-status'
 import { useSystemConfig } from '@/hooks/use-system-config'
@@ -42,7 +46,7 @@ type SystemBrandProps = {
  * System brand component
  * Displays current system logo + name.
  * - inline: compact pill in the top app bar; clicking navigates to home (/)
- * - sidebar: stacked card in the sidebar header (display only)
+ * - sidebar: stacked card in the sidebar header; clicking navigates to home (/)
  */
 export function SystemBrand(props: SystemBrandProps) {
   const { t } = useTranslation()
@@ -50,7 +54,8 @@ export function SystemBrand(props: SystemBrandProps) {
   const { logo } = useSystemConfig()
 
   const variant = props.variant ?? 'sidebar'
-  const name = status?.system_name || props.defaultName || 'New API'
+  const name = getCcapiDisplayName(status?.system_name || props.defaultName)
+  const displayLogo = getCcapiLogoForDarkSurface(logo)
   const version =
     status?.version || props.defaultVersion || t('Unknown version')
 
@@ -66,7 +71,7 @@ export function SystemBrand(props: SystemBrandProps) {
       >
         <div className='flex size-5 items-center justify-center overflow-hidden rounded-md'>
           <img
-            src={logo}
+            src={displayLogo}
             alt={t('Logo')}
             className='size-full rounded-md object-cover'
           />
@@ -81,12 +86,13 @@ export function SystemBrand(props: SystemBrandProps) {
       <SidebarMenuItem>
         <SidebarMenuButton
           size='lg'
-          className='hover:text-sidebar-foreground active:text-sidebar-foreground cursor-default hover:bg-transparent active:bg-transparent'
-          render={<div />}
+          tooltip={t('Go to home')}
+          className='hover:text-sidebar-foreground active:text-sidebar-foreground hover:bg-sidebar-accent/70 active:bg-sidebar-accent/70'
+          render={<Link to='/' aria-label={t('Go to home')} />}
         >
           <div className='flex aspect-square size-8 items-center justify-center overflow-hidden rounded-lg'>
             <img
-              src={logo}
+              src={displayLogo}
               alt={t('Logo')}
               className='size-full rounded-lg object-cover'
             />

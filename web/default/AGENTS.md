@@ -123,6 +123,7 @@
 
 - 以 Tailwind 工具类为主，动态类名用 `cn()` 合并；非动态场景避免内联样式。
 - 响应式采用移动优先与 Tailwind 断点（`sm:`、`md:`、`lg:` 等）；主题与暗色用 CSS 变量与 `dark:`，自定义样式集中在 `src/styles/`，组件内尽量少写自定义 CSS。
+- ccapi 公开页、登录注册页、聊天页、文档页、价格页必须使用统一主题 token：`bg-background`、`text-foreground`、`bg-card`、`border-border`、`text-muted-foreground`、`bg-muted`、`text-card-foreground`。不要在这些页面的主体、卡片、导航、输入框上直接使用 `zinc`、`slate`、`stone`、`neutral`、`gray` 等独立色系工具类；品牌强调色和状态色可以保留，但必须是局部语义用途。ccapi 品牌必须通过 `useSystemConfig()` + `getCcapiLogoForDarkSurface()` 或 `PublicHeader` / `SystemBrand` 渲染，不允许只放文字占位。公开导航和通用顶部导航必须保留：首页、模型广场、文档、控制台首页、关于。新增或改造聊天页不能隐藏原 NewAPI 关键入口：钱包充值、兑换码、API Keys、渠道、模型、用户、日志、系统设置。改动这些页面后执行 `bun run theme:check`、`bun run regression:check` 或 `bun run lint`；`regression:check` 失败时不允许提交或部署。
 
 ### 3.11 文件组织
 

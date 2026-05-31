@@ -68,6 +68,72 @@ For commercial licensing, please contact support@quantumnous.com
   }
 }
 
+.ccapi-public-header {
+  color: var(--foreground);
+}
+
+.ccapi-public-header nav {
+  background: color-mix(in oklch, var(--background) 82%, transparent);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(18px);
+}
+
+.ccapi-public-header a,
+.ccapi-public-header button {
+  color: inherit;
+}
+
+.ccapi-auth-shell input,
+.ccapi-auth-shell button[role='combobox'] {
+  border-color: var(--border);
+  background: var(--card);
+}
+
+.ccapi-auth-shell input:focus-visible {
+  border-color: rgb(251 146 60);
+  box-shadow: 0 0 0 3px rgba(211, 111, 76, 0.18);
+}
+
+.ccapi-auth-shell form > button[type='submit'],
+.ccapi-auth-shell form > button:not([type]) {
+  min-height: 2.75rem;
+  border-radius: 0.5rem;
+  background: var(--foreground);
+  color: var(--background);
+  font-weight: 800;
+}
+
+.ccapi-auth-shell form > button[type='submit']:hover,
+.ccapi-auth-shell form > button:not([type]):hover {
+  opacity: 0.9;
+}
+
+.ccapi-docs-page,
+.ccapi-pricing-page {
+  overflow-wrap: anywhere;
+}
+
+.ccapi-docs-page pre,
+.ccapi-docs-page code {
+  max-width: 100%;
+}
+
+.ccapi-code-block {
+  border-color: var(--border);
+  background: color-mix(in oklch, var(--card) 72%, var(--foreground));
+  color: var(--card-foreground);
+}
+
+.dark .ccapi-code-block {
+  background: color-mix(in oklch, var(--background) 82%, var(--foreground));
+}
+
+@media (max-width: 640px) {
+  .ccapi-docs-page pre {
+    font-size: 0.72rem;
+  }
+}
+
 /* Vercel Geist-style skeleton shimmer */
 .skeleton-shimmer {
   background: linear-gradient(

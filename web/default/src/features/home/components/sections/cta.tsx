@@ -1,21 +1,3 @@
-/*
-Copyright (C) 2023-2026 QuantumNous
-
-This program is free software: you can redistribute it and/or modify
-it under the terms of the GNU Affero General Public License as
-published by the Free Software Foundation, either version 3 of the
-License, or (at your option) any later version.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU Affero General Public License for more details.
-
-You should have received a copy of the GNU Affero General Public License
-along with this program. If not, see <https://www.gnu.org/licenses/>.
-
-For commercial licensing, please contact support@quantumnous.com
-*/
 import { Link } from '@tanstack/react-router'
 import { ArrowRight } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
@@ -30,51 +12,39 @@ interface CTAProps {
 export function CTA(props: CTAProps) {
   const { t } = useTranslation()
 
-  if (props.isAuthenticated) {
-    return null
-  }
-
   return (
-    <section className='relative z-10 overflow-hidden px-6 py-24 md:py-32'>
-      {/* Gradient mesh background */}
-      <div
-        aria-hidden
-        className='absolute inset-0 -z-10 opacity-20 dark:opacity-[0.08]'
-        style={{
-          background: [
-            'radial-gradient(ellipse 50% 50% at 30% 50%, oklch(0.7 0.15 250 / 70%) 0%, transparent 70%)',
-            'radial-gradient(ellipse 40% 40% at 70% 40%, oklch(0.65 0.12 200 / 50%) 0%, transparent 70%)',
-          ].join(', '),
-        }}
-      />
-
+    <section className='bg-background text-foreground px-5 py-18 md:px-8 md:py-24'>
       <AnimateInView
-        className='mx-auto max-w-2xl text-center'
+        className='border-border bg-card mx-auto max-w-6xl rounded-lg border p-7 shadow-[0_18px_45px_rgba(93,55,29,0.08)] md:flex md:items-center md:justify-between md:p-10'
         animation='scale-in'
       >
-        <h2 className='text-2xl leading-tight font-bold tracking-tight md:text-4xl'>
-          {t('Ready to simplify')}
-          <br />
-          <span className='bg-gradient-to-r from-blue-400 via-violet-400 to-purple-500 bg-clip-text text-transparent'>
-            {t('your AI integration?')}
-          </span>
-        </h2>
-        <p className='text-muted-foreground/80 mx-auto mt-5 max-w-md text-sm leading-relaxed md:text-base'>
-          {t(
-            'Deploy your own gateway and start routing requests through your configured upstream services.'
-          )}
-        </p>
-        <div className='mt-8 flex items-center justify-center gap-3'>
-          <Button className='group rounded-lg' render={<Link to='/sign-up' />}>
-            {t('Get Started')}
-            <ArrowRight className='ml-1 size-3.5 transition-transform duration-200 group-hover:translate-x-0.5' />
+        <div>
+          <p className='mb-3 text-xs font-black tracking-[0.18em] text-orange-400 uppercase'>
+            {t('START NOW')}
+          </p>
+          <h2 className='max-w-2xl text-3xl leading-tight font-black md:text-5xl'>
+            {t('把 Key 配好，今天就让工具跑起来。')}
+          </h2>
+          <p className='text-muted-foreground mt-4 max-w-xl text-sm leading-7'>
+            {t('完成注册后可购买兑换码，再回到钱包页输入兑换码完成到账。')}
+          </p>
+        </div>
+        <div className='mt-7 flex flex-col gap-3 sm:flex-row md:mt-0'>
+          <Button
+            className='bg-foreground text-background hover:bg-foreground/90 h-12 rounded-lg px-7 font-bold'
+            asChild
+          >
+            <Link to={props.isAuthenticated ? '/dashboard' : '/sign-up'}>
+              {props.isAuthenticated ? t('进入控制台') : t('注册账号')}
+              <ArrowRight className='ml-2 size-4' />
+            </Link>
           </Button>
           <Button
             variant='outline'
-            className='border-border/50 hover:border-border hover:bg-muted/50 rounded-lg'
-            render={<Link to='/pricing' />}
+            className='border-border text-foreground hover:bg-accent h-12 rounded-lg px-7 font-bold'
+            asChild
           >
-            {t('View Pricing')}
+            <Link to='/pricing'>{t('查看价格')}</Link>
           </Button>
         </div>
       </AnimateInView>
